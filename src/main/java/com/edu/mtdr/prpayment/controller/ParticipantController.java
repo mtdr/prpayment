@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * Participant controller
+ */
 @RestController
 @RequestMapping("/api/participants")
 @Api(tags = {"participants"}, value = "Participant controller")
