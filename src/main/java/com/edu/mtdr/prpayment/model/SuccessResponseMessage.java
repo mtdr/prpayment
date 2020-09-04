@@ -2,7 +2,11 @@ package com.edu.mtdr.prpayment.model;
 
 import io.swagger.annotations.ApiModel;
 
-@ApiModel(value = "")
+/**
+ * Success response message
+ * @param <D> message data
+ */
+@ApiModel(description = "Success response message")
 public class SuccessResponseMessage<D> extends BaseResponseMessage<D> {
 
     public SuccessResponseMessage(int statusCode, boolean isSuccess) {

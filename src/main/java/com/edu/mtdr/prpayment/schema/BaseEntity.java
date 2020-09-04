@@ -1,7 +1,10 @@
 package com.edu.mtdr.prpayment.schema;
 
+import io.swagger.annotations.ApiModel;
+
 import javax.persistence.*;
 
+@ApiModel(value = "Base entity")
 @MappedSuperclass
 @Access(AccessType.FIELD)
 public abstract class BaseEntity {

@@ -19,39 +19,39 @@ import java.util.List;
 @Api(tags = {"participants"}, value = "Participant controller")
 public class ParticipantController {
     private final IParticipantService participantService;
-    private final ParticipantRepository repository;
+    private final ParticipantRepository participantRepository;
 
     @Autowired
-    public ParticipantController(IParticipantService participantService, ParticipantRepository repository) {
+    public ParticipantController(IParticipantService participantService, ParticipantRepository participantRepository) {
         this.participantService = participantService;
-        this.repository = repository;
+        this.participantRepository = participantRepository;
     }
 
     @GetMapping("/list")
     @ApiOperation("List participants")
     public BaseResponseMessage<?> listParticipants() {
-        final List<ParticipantEntity> dbParticipants = new ArrayList<>(repository.findAll());
+        final List<ParticipantEntity> dbParticipants = new ArrayList<>(participantRepository.findAll());
         return new SuccessResponseMessage<>(dbParticipants);
     }
 
     @GetMapping("/get/{id}")
     @ApiOperation("Get participant by id")
     public BaseResponseMessage<ParticipantEntity> getParticipant(@PathVariable("id") long id) {
-        final ParticipantEntity dbParticipant = repository.findById(id).orElse(null);
+        final ParticipantEntity dbParticipant = participantRepository.findById(id).orElse(null);
         return new SuccessResponseMessage<>(dbParticipant);
     }
 
     @PostMapping("/save")
     @ApiOperation("Create or update participant")
     public BaseResponseMessage<?> saveParticipant(@RequestBody ParticipantEntity participant) {
-        final ParticipantEntity savedParticipant = repository.save(participant);
+        final ParticipantEntity savedParticipant = participantRepository.save(participant);
         return new SuccessResponseMessage<>(savedParticipant);
     }
 
     @PostMapping("/delete")
     @ApiOperation("Delete participant")
     public BaseResponseMessage<?> deleteParticipant(@RequestBody ParticipantEntity participant) {
-        repository.deleteById(participant.getId());
+        participantRepository.deleteById(participant.getId());
         return new SuccessResponseMessage<>();
     }
 }

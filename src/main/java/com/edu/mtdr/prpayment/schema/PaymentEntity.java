@@ -2,8 +2,11 @@ package com.edu.mtdr.prpayment.schema;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
+@ApiModel(value = "Payment entity")
 @Table(name = "payment")
 @Entity
 @Access(AccessType.FIELD)
