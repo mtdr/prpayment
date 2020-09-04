@@ -6,11 +6,8 @@ import io.swagger.annotations.ApiModelProperty;
 
 @Table(name = "payment")
 @Entity
-public class PaymentEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-
+@Access(AccessType.FIELD)
+public class PaymentEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "senderid")
     @ApiModelProperty(value = "Sender")
@@ -22,4 +19,35 @@ public class PaymentEntity {
     private ParticipantEntity receiver;
 
     private BigDecimal amount;
+
+    public ParticipantEntity getSender() {
+        return sender;
+    }
+
+    public void setSender(ParticipantEntity sender) {
+        this.sender = sender;
+    }
+
+    public ParticipantEntity getReceiver() {
+        return receiver;
+    }
+
+    public void setReceiver(ParticipantEntity receiver) {
+        this.receiver = receiver;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Payment [id=%d]",
+                getId());
+    }
 }

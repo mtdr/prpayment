@@ -4,11 +4,8 @@ import javax.persistence.*;
 
 @Table(name = "participant")
 @Entity
-public class ParticipantEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-
+@Access(AccessType.FIELD)
+public class ParticipantEntity extends BaseEntity {
     @Basic
     private String name;
 
@@ -24,6 +21,6 @@ public class ParticipantEntity {
     public String toString() {
         return String.format(
                 "Participant [id=%d]",
-                id);
+                getId());
     }
 }

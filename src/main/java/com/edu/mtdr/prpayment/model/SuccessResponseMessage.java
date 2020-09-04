@@ -12,4 +12,13 @@ public class SuccessResponseMessage<D> extends BaseResponseMessage<D> {
     public SuccessResponseMessage() {
         super(200, true);
     }
+
+    public SuccessResponseMessage(int statusCode, boolean result, D data) {
+        super(statusCode, result);
+        this.data = data;
+    }
+
+    public SuccessResponseMessage(D data) {
+        this(200, true, data);
+    }
 }
