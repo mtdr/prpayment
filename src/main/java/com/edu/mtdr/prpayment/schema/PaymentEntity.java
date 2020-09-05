@@ -21,13 +21,13 @@ import java.util.Objects;
 @Access(AccessType.FIELD)
 public class PaymentEntity extends BaseEntity {
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "senderid")
     @ApiModelProperty(value = "Sender")
     private ParticipantEntity sender;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "receiverid")
     @ApiModelProperty(value = "Receiver")
     private ParticipantEntity receiver;
