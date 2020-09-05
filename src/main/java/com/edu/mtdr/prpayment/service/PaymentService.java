@@ -25,7 +25,7 @@ public class PaymentService implements IPaymentService {
     @Override
     public PaymentEntity save(PaymentEntity payment) {
         if (payment != null) {
-            int shardNum = payment.hashCode() % 3;
+            int shardNum = Math.abs(payment.hashCode()) % 3;
             payment.setShardNum(shardNum);
             payment.setDate(new Date());
             switch (shardNum) {

@@ -1,7 +1,6 @@
 package com.edu.mtdr.prpayment;
 
 import com.edu.mtdr.prpayment.model.FailureResponseMessage;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
