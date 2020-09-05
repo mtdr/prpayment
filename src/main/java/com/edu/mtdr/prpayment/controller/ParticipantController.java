@@ -1,5 +1,7 @@
 package com.edu.mtdr.prpayment.controller;
 
+import com.edu.mtdr.prpayment.config.datasource.DbContextHolder;
+import com.edu.mtdr.prpayment.config.datasource.DbTypeEnum;
 import com.edu.mtdr.prpayment.model.BaseResponseMessage;
 import com.edu.mtdr.prpayment.model.SuccessResponseMessage;
 import com.edu.mtdr.prpayment.repository.ParticipantRepository;
@@ -55,6 +57,7 @@ public class ParticipantController {
     @PostMapping("/save2")
     @ApiOperation("Create or update participant")
     public BaseResponseMessage<?> saveParticipant2(@RequestBody ParticipantEntity participant) {
+        DbContextHolder.setCurrentDb(DbTypeEnum.SHARD2);
         return new SuccessResponseMessage<>(participantService.save(participant));
     }
 
