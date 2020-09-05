@@ -31,6 +31,11 @@ public class FailureResponseMessage<D> extends BaseResponseMessage<D> {
         this(200, true, data, reason);
     }
 
+    public FailureResponseMessage(String reason) {
+        this();
+        this.reason = reason;
+    }
+
     public String getReason() {
         return reason;
     }

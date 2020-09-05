@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Payment service implementation
@@ -28,6 +29,7 @@ public class PaymentService implements IPaymentService {
             int shardNum = Math.abs(payment.hashCode()) % 3 + 1;
             payment.setShardNum(shardNum);
             payment.setDate(new Date());
+            payment.setId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
             switch (shardNum) {
                 case 1:
                     DbContextHolder.setCurrentDb(DbTypeEnum.SHARD1);
