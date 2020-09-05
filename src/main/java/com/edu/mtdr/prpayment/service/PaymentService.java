@@ -1,11 +1,11 @@
 package com.edu.mtdr.prpayment.service;
 
+import com.edu.mtdr.prpayment.config.datasource.DbContextHolder;
+import com.edu.mtdr.prpayment.config.datasource.DbTypeEnum;
 import com.edu.mtdr.prpayment.repository.PaymentRepository;
-import com.edu.mtdr.prpayment.schema.ParticipantEntity;
 import com.edu.mtdr.prpayment.schema.PaymentEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -30,13 +30,16 @@ public class PaymentService implements IPaymentService {
             payment.setDate(new Date());
             switch (shardNum) {
                 case 0:
-                    return save1(payment);
+                    DbContextHolder.setCurrentDb(DbTypeEnum.SHARD1);
+                    return paymentRepository.save(payment);
                 case 1:
-                    return save1(payment);
+                    DbContextHolder.setCurrentDb(DbTypeEnum.SHARD2);
+                    return paymentRepository.save(payment);
                 case 2:
-                    return save1(payment);
+                    DbContextHolder.setCurrentDb(DbTypeEnum.SHARD3);
+                    return paymentRepository.save(payment);
                 default:
-                    return save1(payment);
+                    return paymentRepository.save(payment);
             }
         } else {
             return null;
@@ -46,11 +49,6 @@ public class PaymentService implements IPaymentService {
     @Override
     public BigDecimal sumAmountsBySender(Long senderId) {
         return paymentRepository.getSumBySenderId(senderId);
-    }
-
-//    @Transactional(transactionManager = "tm1")
-    protected PaymentEntity save1(PaymentEntity payment) {
-        return paymentRepository.save(payment);
     }
 
 
