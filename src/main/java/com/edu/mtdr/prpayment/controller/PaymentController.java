@@ -125,6 +125,18 @@ public class PaymentController {
         }
     }
 
+    /**
+     * @param message {@link RequestMessage} with list of payments in {@link RequestMessage#getData()}}
+     * @return {@link SuccessResponseMessage} if saved or {@link FailureResponseMessage} if some error
+     */
+    @PostMapping("/upload")
+    @ApiOperation("Upload list of payments")
+    public BaseResponseMessage<?> uploadPayments(@RequestBody RequestMessage<List<PaymentEntity>> message) {
+        return paymentService.saveAll(message.getData())
+                ? new SuccessResponseMessage<>("Successfully saved")
+                : new FailureResponseMessage<>("Save failed");
+    }
+
 
     /**
      * @return message with success, or fail if participants not found or some unchecked exception

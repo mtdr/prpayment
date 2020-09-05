@@ -3,6 +3,7 @@ package com.edu.mtdr.prpayment.service;
 import com.edu.mtdr.prpayment.schema.PaymentEntity;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Payment service
@@ -13,6 +14,12 @@ public interface IPaymentService {
      * @return saved payment
      */
     PaymentEntity save(PaymentEntity payment);
+
+    /**
+     * @param payments list of saving payments
+     * @return is successfully saved
+     */
+    Boolean saveAll(List<PaymentEntity> payments);
 
     /**
      * @param senderId participant id

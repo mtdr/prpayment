@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 /**
  * Payment service implementation
@@ -26,9 +28,11 @@ public class PaymentService implements IPaymentService {
     @Override
     public PaymentEntity save(PaymentEntity payment) {
         if (payment != null) {
-            int shardNum = Math.abs(payment.hashCode()) % 3 + 1;
+            int shardNum = getShardNum(payment);
             payment.setShardNum(shardNum);
-            payment.setDate(new Date());
+            if (payment.getDate() == null) {
+                payment.setDate(new Date());
+            }
             payment.setId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
             switch (shardNum) {
                 case 1:
@@ -46,6 +50,33 @@ public class PaymentService implements IPaymentService {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public Boolean saveAll(List<PaymentEntity> payments) {
+        if (payments != null && payments.size() > 0) {
+            for (PaymentEntity payment : payments) {
+                int shardNum = getShardNum(payment);
+                if (payment.getDate() == null) {
+                    payment.setDate(new Date());
+                }
+                payment.setShardNum(shardNum);
+                payment.setId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
+            }
+            for (DbTypeEnum dbType : DbTypeEnum.values()) {
+                payments.parallelStream().filter(p -> p.getShardNum() == dbType.ordinal() + 1).forEach(p -> {
+                    DbContextHolder.setCurrentDb(dbType);
+                    paymentRepository.save(p);
+                });
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private int getShardNum(PaymentEntity payment) {
+        return Math.abs(payment.hashCode()) % 3 + 1;
     }
 
     @Override
