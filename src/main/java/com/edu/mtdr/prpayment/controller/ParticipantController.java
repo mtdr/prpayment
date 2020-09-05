@@ -55,7 +55,7 @@ public class ParticipantController {
     @PostMapping("/save2")
     @ApiOperation("Create or update participant")
     public BaseResponseMessage<?> saveParticipant2(@RequestBody ParticipantEntity participant) {
-        return new SuccessResponseMessage<>(participantService.save2(participant));
+        return new SuccessResponseMessage<>(participantService.save(participant));
     }
 
     @PostMapping("/delete")

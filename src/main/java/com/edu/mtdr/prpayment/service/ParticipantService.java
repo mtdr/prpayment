@@ -19,22 +19,24 @@ public class ParticipantService implements IParticipantService {
         this.participantRepository = participantRepository;
     }
 
-    @Override
-    @Transactional(transactionManager = "transactionManager")
+//    @Transactional(transactionManager = "transactionManager")
     public ParticipantEntity save1(ParticipantEntity participant) {
         return participantRepository.save(participant);
     }
 
-    @Override
-    @Qualifier("DS2TransactionManager")
-    @Transactional(transactionManager = "DS2TransactionManager")
+//    @Qualifier("DS2TransactionManager")
+//    @Transactional(transactionManager = "DS2TransactionManager")
     public ParticipantEntity save2(ParticipantEntity participant) {
         return participantRepository.save(participant);
     }
 
-    @Override
-    @Transactional(transactionManager = "DS3TransactionManager")
+//    @Transactional(transactionManager = "DS3TransactionManager")
     public ParticipantEntity save3(ParticipantEntity participant) {
         return participantRepository.save(participant);
+    }
+
+    @Override
+    public ParticipantEntity save(ParticipantEntity participant) {
+        return save2(participant);
     }
 }

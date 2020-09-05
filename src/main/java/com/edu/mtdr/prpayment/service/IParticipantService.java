@@ -7,9 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
  * Participant service
  */
 public interface IParticipantService {
-    ParticipantEntity save1(ParticipantEntity participant);
-    ParticipantEntity save2(ParticipantEntity participant);
-
-    @Transactional(transactionManager = "DS3TransactionManager")
-    ParticipantEntity save3(ParticipantEntity participant);
+    /**
+     * @param participant participant to save
+     * @return saved entity
+     */
+    ParticipantEntity save(ParticipantEntity participant);
 }

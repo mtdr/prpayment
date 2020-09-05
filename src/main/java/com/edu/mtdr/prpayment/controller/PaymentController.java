@@ -50,8 +50,7 @@ public class PaymentController {
     @PostMapping("/save")
     @ApiOperation("Create or update payment")
     public BaseResponseMessage<?> savePayment(@RequestBody PaymentEntity payment) {
-        final PaymentEntity savedPayment = paymentRepository.save(payment);
-        return new SuccessResponseMessage<>(savedPayment);
+        return new SuccessResponseMessage<>(paymentService.save(payment));
     }
 
     @PostMapping("/delete")
