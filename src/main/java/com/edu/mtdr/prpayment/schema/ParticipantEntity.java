@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,17 +14,18 @@ import java.util.Set;
 @Entity
 @Access(AccessType.FIELD)
 public class ParticipantEntity extends BaseEntity {
+    @NotNull
     @ApiModelProperty(value = "name")
     @Basic
     private String name;
 
     @ApiModelProperty(value = "Sent payments by this participant")
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sender", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "sender", fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonIgnore
     private Set<PaymentEntity> sentPayments = new HashSet<>();
 
     @ApiModelProperty(value = "Received payments by this participant")
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "receiver", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "receiver", fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonIgnore
     private Set<PaymentEntity> receivedPayments = new HashSet<>();
 
