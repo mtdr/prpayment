@@ -33,4 +33,14 @@ public interface IPaymentService {
      * @return sum of payments sent by participant
      */
     BigDecimal sumAmountsBySenderAtOneShard(Long senderId, int shardNum);
+
+    /**
+     * @return is successfully generated and saved payments
+     */
+    Boolean generateAndSavePayments();
+
+    /**
+     * @return list of generated but not persisted payments
+     */
+    List<PaymentEntity> generatePayments();
 }

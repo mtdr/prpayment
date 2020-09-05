@@ -2,16 +2,19 @@ package com.edu.mtdr.prpayment.service;
 
 import com.edu.mtdr.prpayment.config.datasource.DbContextHolder;
 import com.edu.mtdr.prpayment.config.datasource.DbTypeEnum;
+import com.edu.mtdr.prpayment.repository.ParticipantRepository;
 import com.edu.mtdr.prpayment.repository.PaymentRepository;
+import com.edu.mtdr.prpayment.schema.ParticipantEntity;
 import com.edu.mtdr.prpayment.schema.PaymentEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
+import java.util.stream.IntStream;
 
 /**
  * Payment service implementation
@@ -19,10 +22,13 @@ import java.util.stream.Stream;
 @Service
 public class PaymentService implements IPaymentService {
     private final PaymentRepository paymentRepository;
+    private final ParticipantRepository participantRepository;
 
     @Autowired
-    public PaymentService(PaymentRepository paymentRepository) {
+    public PaymentService(PaymentRepository paymentRepository,
+                          ParticipantRepository participantRepository) {
         this.paymentRepository = paymentRepository;
+        this.participantRepository = participantRepository;
     }
 
     @Override
@@ -97,6 +103,38 @@ public class PaymentService implements IPaymentService {
         DbTypeEnum dbType = DbTypeEnum.values()[shardNum - 1];
         DbContextHolder.setCurrentDb(dbType);
         return paymentRepository.getSumBySenderId(senderId);
+    }
+
+    @Override
+    public Boolean generateAndSavePayments() {
+        List<PaymentEntity> payments = generatePayments();
+        return saveAll(payments);
+    }
+
+    @Override
+    public List<PaymentEntity> generatePayments() {
+        List<PaymentEntity> payments = new ArrayList<>();
+        ParticipantEntity aParticipant = participantRepository.findFirstByName("a").orElse(null);
+        ParticipantEntity bParticipant = participantRepository.findFirstByName("b").orElse(null);
+        if (aParticipant == null || bParticipant == null) {
+            return payments;
+        }
+        IntStream.rangeClosed(0, (int) Math.pow(10, 4)).forEach(i -> {
+            PaymentEntity payment = new PaymentEntity();
+            payment.setSender(aParticipant);
+            payment.setReceiver(bParticipant);
+            payment.setAmount(BigDecimal.valueOf(Math.random()).multiply(BigDecimal.valueOf(1000)));
+            payments.add(payment);
+        });
+
+        IntStream.rangeClosed(0, (int) Math.pow(10, 4)).forEach(i -> {
+            PaymentEntity payment = new PaymentEntity();
+            payment.setSender(bParticipant);
+            payment.setReceiver(aParticipant);
+            payment.setAmount(BigDecimal.valueOf(Math.random()).multiply(BigDecimal.valueOf(1000)));
+            payments.add(payment);
+        });
+        return payments;
     }
 
 }

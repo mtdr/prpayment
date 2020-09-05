@@ -141,29 +141,22 @@ public class PaymentController {
     /**
      * @return message with success, or fail if participants not found or some unchecked exception
      */
+    @PostMapping("/generate/save")
+    @ApiOperation("Generate payments for a and b participants and save")
+    public BaseResponseMessage<?> generateAndSavePayments() {
+        if (paymentService.generateAndSavePayments()) {
+            return new SuccessResponseMessage<>();
+        } else {
+            return new FailureResponseMessage<>();
+        }
+    }
+
+    /**
+     * @return message with list of generated payments
+     */
     @PostMapping("/generate")
     @ApiOperation("Generate payments for a and b participants")
     public BaseResponseMessage<?> generatePayments() {
-        ParticipantEntity aParticipant = participantRepository.findFirstByName("a").orElse(null);
-        ParticipantEntity bParticipant = participantRepository.findFirstByName("b").orElse(null);
-        if (aParticipant == null || bParticipant == null) {
-            return new FailureResponseMessage<>();
-        }
-        IntStream.rangeClosed(0, (int) Math.pow(10, 4)).forEach(i -> {
-            PaymentEntity payment = new PaymentEntity();
-            payment.setSender(aParticipant);
-            payment.setReceiver(bParticipant);
-            payment.setAmount(BigDecimal.valueOf(Math.random()).multiply(BigDecimal.valueOf(1000)));
-            paymentService.save(payment);
-        });
-
-        IntStream.rangeClosed(0, (int) Math.pow(10, 4)).forEach(i -> {
-            PaymentEntity payment = new PaymentEntity();
-            payment.setSender(bParticipant);
-            payment.setReceiver(aParticipant);
-            payment.setAmount(BigDecimal.valueOf(Math.random()).multiply(BigDecimal.valueOf(1000)));
-            paymentService.save(payment);
-        });
-        return new SuccessResponseMessage<>();
+        return new SuccessResponseMessage<>(paymentService.generatePayments());
     }
 }
