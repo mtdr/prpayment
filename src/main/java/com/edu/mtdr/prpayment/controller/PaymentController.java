@@ -1,5 +1,7 @@
 package com.edu.mtdr.prpayment.controller;
 
+import com.edu.mtdr.prpayment.config.datasource.DbContextHolder;
+import com.edu.mtdr.prpayment.config.datasource.DbTypeEnum;
 import com.edu.mtdr.prpayment.model.BaseResponseMessage;
 import com.edu.mtdr.prpayment.model.FailureResponseMessage;
 import com.edu.mtdr.prpayment.model.RequestMessage;
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.IntStream;
 
 
@@ -41,13 +42,24 @@ public class PaymentController {
         this.participantRepository = participantRepository;
     }
 
+    /**
+     * @return {@link SuccessResponseMessage} with list of all {@link PaymentEntity}
+     */
     @GetMapping("/list")
     @ApiOperation("List payments")
     public BaseResponseMessage<?> listPayments() {
-        final List<PaymentEntity> dbPayments = new ArrayList<>(paymentRepository.findAll());
-        return new SuccessResponseMessage<>(dbPayments);
+        final List<ParticipantEntity> payments = new ArrayList<>();
+        for (DbTypeEnum dbType : DbTypeEnum.values()) {
+            DbContextHolder.setCurrentDb(dbType);
+            payments.addAll(participantRepository.findAll());
+        }
+        return new SuccessResponseMessage<>(payments);
     }
 
+    /**
+     * @param id {@link PaymentEntity}'s id
+     * @return {@link SuccessResponseMessage} with {@link PaymentEntity}
+     */
     @GetMapping("/get/{id}")
     @ApiOperation("Get payment by id")
     public BaseResponseMessage<PaymentEntity> getPayment(@PathVariable("id") Long id) {
@@ -55,21 +67,33 @@ public class PaymentController {
         return new SuccessResponseMessage<>(dbPayment);
     }
 
+    /**
+     * @param payment payment to save, without id and date
+     * @return {@link SuccessResponseMessage} with saved {@link PaymentEntity}
+     */
     @PostMapping("/save")
     @ApiOperation("Create or update payment")
     public BaseResponseMessage<?> savePayment(@RequestBody PaymentEntity payment) {
         return new SuccessResponseMessage<>(paymentService.save(payment));
     }
 
+    /**
+     * @param message {@link RequestMessage} with id of payment to delete
+     * @return {@link SuccessResponseMessage} empty message if all ok, {@link FailureResponseMessage} if exception
+     */
     @PostMapping("/delete")
     @ApiOperation("Delete payment")
-    public BaseResponseMessage<?> deletePayment(@RequestBody PaymentEntity payment) {
-        paymentRepository.deleteById(payment.getId());
+    public BaseResponseMessage<?> deletePayment(@RequestBody RequestMessage<Long> message) {
+        paymentRepository.deleteById(message.getData());
         return new SuccessResponseMessage<>();
     }
 
+    /**
+     * @param message {@link RequestMessage with participant name in {@link RequestMessage#getData()}}
+     * @return success with result or failure if unchecked message
+     */
     @PostMapping("/sum")
-    @ApiOperation("Get sum of payments, where specified participant id is sender")
+    @ApiOperation("Get sum of payments, where specified participant name is sender")
     public BaseResponseMessage<?> sumPayments(@RequestBody RequestMessage<String> message) {
         ParticipantEntity participant = participantRepository.findFirstByName(message.getData()).orElse(null);
         if (participant != null) {
@@ -80,8 +104,11 @@ public class PaymentController {
         }
     }
 
+    /**
+     * @return message with success, or fail if participants not found or some unchecked exception
+     */
     @PostMapping("/generate")
-    @ApiOperation("Generate payments for a and b")
+    @ApiOperation("Generate payments for a and b participants")
     public BaseResponseMessage<?> generatePayments() {
         ParticipantEntity aParticipant = participantRepository.findFirstByName("a").orElse(null);
         ParticipantEntity bParticipant = participantRepository.findFirstByName("b").orElse(null);

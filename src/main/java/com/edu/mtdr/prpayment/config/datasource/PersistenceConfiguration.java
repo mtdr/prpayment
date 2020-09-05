@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Data source configuration
+ * Multiple data source configuration
  */
 @Configuration
 @EnableTransactionManagement
@@ -101,7 +101,7 @@ public class PersistenceConfiguration {
 
     private Properties hibernateProperties() {
         Properties properties = new Properties();
-        properties.put("hibernate.show_sql", true);
+        properties.put("hibernate.show_sql", false);
         properties.put("hibernate.format_sql", true);
         properties.put(AvailableSettings.HBM2DDL_AUTO, environment.getProperty("spring.jpa.hibernate.ddl-auto"));
         return properties;
