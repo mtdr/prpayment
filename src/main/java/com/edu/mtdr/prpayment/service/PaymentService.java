@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.UUID;
 
 /**
  * Payment service implementation
@@ -47,9 +48,16 @@ public class PaymentService implements IPaymentService {
     }
 
     @Override
-    public BigDecimal sumAmountsBySender(Long senderId) {
-        return paymentRepository.getSumBySenderId(senderId);
+    public BigDecimal sumAmountsBySender(UUID senderId) {
+        BigDecimal res = BigDecimal.ZERO;
+        for (DbTypeEnum dbType : DbTypeEnum.values()) {
+            DbContextHolder.setCurrentDb(dbType);
+            BigDecimal temp = paymentRepository.getSumBySenderId(senderId);
+            if (temp != null) {
+                res = res.add(temp);
+            }
+        }
+        return res;
     }
-
 
 }

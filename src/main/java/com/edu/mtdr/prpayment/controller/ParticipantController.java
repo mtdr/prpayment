@@ -10,11 +10,11 @@ import com.edu.mtdr.prpayment.service.IParticipantService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -42,7 +42,7 @@ public class ParticipantController {
 
     @GetMapping("/get/{id}")
     @ApiOperation("Get participant by id")
-    public BaseResponseMessage<ParticipantEntity> getParticipant(@PathVariable("id") long id) {
+    public BaseResponseMessage<ParticipantEntity> getParticipant(@PathVariable("id") UUID id) {
         final ParticipantEntity dbParticipant = participantRepository.findById(id).orElse(null);
         return new SuccessResponseMessage<>(dbParticipant);
     }

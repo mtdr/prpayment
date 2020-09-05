@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 
 /**
@@ -44,7 +45,7 @@ public class PaymentController {
 
     @GetMapping("/get/{id}")
     @ApiOperation("Get payment by id")
-    public BaseResponseMessage<PaymentEntity> getPayment(@PathVariable("id") long id) {
+    public BaseResponseMessage<PaymentEntity> getPayment(@PathVariable("id") UUID id) {
         final PaymentEntity dbPayment = paymentRepository.findById(id).orElse(null);
         return new SuccessResponseMessage<>(dbPayment);
     }
@@ -64,7 +65,7 @@ public class PaymentController {
 
     @PostMapping("/sum")
     @ApiOperation("Get sum of payments, where specified participant id is sender")
-    public BaseResponseMessage<?> deletePayment(@RequestBody Long senderId) {
+    public BaseResponseMessage<?> deletePayment(@RequestBody UUID senderId) {
         BigDecimal sum = Optional.ofNullable(paymentService.sumAmountsBySender(senderId)).orElse(BigDecimal.ZERO);
         return new SuccessResponseMessage<>(sum);
     }

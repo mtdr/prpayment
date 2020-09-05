@@ -8,18 +8,19 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 /**
  * Payment repository
  */
 @Repository
-public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
+public interface PaymentRepository extends JpaRepository<PaymentEntity, UUID> {
     /**
      * @param senderId id of participant, who sent payment
      * @return sum of payments by this participant
      */
     @Query("SELECT SUM(p.amount) FROM PaymentEntity p WHERE p.sender.id = :id")
-    BigDecimal getSumBySenderId(@Param("id") Long senderId);
+    BigDecimal getSumBySenderId(@Param("id") UUID senderId);
 
 
     /**
