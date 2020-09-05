@@ -22,6 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+/**
+ * Data source configuration
+ */
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
@@ -36,32 +39,32 @@ public class PersistenceConfiguration {
     Environment environment;
 
     @Primary
-    @Bean(name = "mainDataSource")
+    @Bean(name = "shard1DS")
     @ConfigurationProperties("app.datasource.ds1")
-    public DataSource mainDataSource() {
+    public DataSource shard1DS() {
         return DataSourceBuilder.create().type(HikariDataSource.class).build();
     }
 
-    @Bean(name = "clientADataSource")
+    @Bean(name = "shard2DS")
     @ConfigurationProperties("app.datasource.ds2")
-    public DataSource clientADataSource() {
+    public DataSource shard2DS() {
         return DataSourceBuilder.create().type(HikariDataSource.class).build();
     }
 
-    @Bean(name = "clientBDataSource")
+    @Bean(name = "shard3DS")
     @ConfigurationProperties("app.datasource.ds3")
-    public DataSource clientBDataSource() {
+    public DataSource shard3DS() {
         return DataSourceBuilder.create().type(HikariDataSource.class).build();
     }
 
     @Bean(name = "multiRoutingDataSource")
     public DataSource multiRoutingDataSource() {
         Map<Object, Object> targetDataSources = new HashMap<>();
-        targetDataSources.put(DbTypeEnum.SHARD1, mainDataSource());
-        targetDataSources.put(DbTypeEnum.SHARD2, clientADataSource());
-        targetDataSources.put(DbTypeEnum.SHARD3, clientBDataSource());
+        targetDataSources.put(DbTypeEnum.SHARD1, shard1DS());
+        targetDataSources.put(DbTypeEnum.SHARD2, shard2DS());
+        targetDataSources.put(DbTypeEnum.SHARD3, shard3DS());
         MultiRoutingDataSource multiRoutingDataSource = new MultiRoutingDataSource();
-        multiRoutingDataSource.setDefaultTargetDataSource(mainDataSource());
+        multiRoutingDataSource.setDefaultTargetDataSource(shard1DS());
         multiRoutingDataSource.setTargetDataSources(targetDataSources);
         return multiRoutingDataSource;
     }
@@ -74,9 +77,6 @@ public class PersistenceConfiguration {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         em.setJpaProperties(hibernateProperties());
-        HashMap<String, Object> properties = new HashMap<>();
-        properties.put(AvailableSettings.HBM2DDL_AUTO, environment.getProperty("spring.jpa.hibernate.ddl-auto"));
-        em.setJpaPropertyMap(properties);
         return em;
     }
 
@@ -103,6 +103,7 @@ public class PersistenceConfiguration {
         Properties properties = new Properties();
         properties.put("hibernate.show_sql", true);
         properties.put("hibernate.format_sql", true);
+        properties.put(AvailableSettings.HBM2DDL_AUTO, environment.getProperty("spring.jpa.hibernate.ddl-auto"));
         return properties;
     }
 }
