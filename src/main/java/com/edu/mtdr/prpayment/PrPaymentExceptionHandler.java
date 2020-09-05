@@ -2,6 +2,7 @@ package com.edu.mtdr.prpayment;
 
 import com.edu.mtdr.prpayment.model.FailureResponseMessage;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,7 +19,7 @@ public class PrPaymentExceptionHandler {
     @ResponseBody
     @ExceptionHandler(DataIntegrityViolationException.class)
     public FailureResponseMessage<?> handleDataIntegrityExceptions(DataIntegrityViolationException e) {
-        return new FailureResponseMessage<>(400, false, e.getMessage());
+        return new FailureResponseMessage<>(HttpStatus.BAD_REQUEST.value(), false, e.getMessage());
     }
 
 
@@ -31,6 +32,6 @@ public class PrPaymentExceptionHandler {
     @ResponseBody
     @ExceptionHandler(Exception.class)
     public FailureResponseMessage<?> handleCommonExceptions(Exception e) {
-        return new FailureResponseMessage<>(400, false, e.getMessage());
+        return new FailureResponseMessage<>(HttpStatus.BAD_REQUEST.value(), false, e.getMessage());
     }
 }

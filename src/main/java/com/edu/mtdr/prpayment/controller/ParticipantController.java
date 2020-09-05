@@ -68,8 +68,8 @@ public class ParticipantController {
      *                of {@link ParticipantEntity} to delete
      * @return {@link SuccessResponseMessage} empty message if all ok, {@link FailureResponseMessage} if exception
      */
-    @PostMapping("/delete")
-    @ApiOperation("Delete participant")
+    @PostMapping("/delete/id")
+    @ApiOperation("Delete participant by id")
     public BaseResponseMessage<?> deleteParticipantById(@RequestBody RequestMessage<Long> message) {
         participantRepository.deleteById(message.getData());
         return new SuccessResponseMessage<>();
@@ -80,8 +80,8 @@ public class ParticipantController {
      *                of {@link ParticipantEntity} to delete
      * @return {@link SuccessResponseMessage} empty message if all ok, {@link FailureResponseMessage} if exception
      */
-    @PostMapping("/delete")
-    @ApiOperation("Delete participant")
+    @PostMapping("/delete/name")
+    @ApiOperation("Delete participant by name")
     public BaseResponseMessage<?> deleteParticipantByName(@RequestBody RequestMessage<String> message) {
         ParticipantEntity participant = participantRepository.findFirstByName(message.getData()).orElse(null);
         if (participant != null) {

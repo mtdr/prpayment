@@ -47,11 +47,11 @@ public class PaymentController {
      */
     @GetMapping("/list")
     @ApiOperation("List payments")
-    public BaseResponseMessage<?> listPayments() {
-        final List<ParticipantEntity> payments = new ArrayList<>();
+    public BaseResponseMessage<List<PaymentEntity>> listPayments() {
+        final List<PaymentEntity> payments = new ArrayList<>();
         for (DbTypeEnum dbType : DbTypeEnum.values()) {
             DbContextHolder.setCurrentDb(dbType);
-            payments.addAll(participantRepository.findAll());
+            payments.addAll(paymentRepository.findAll());
         }
         return new SuccessResponseMessage<>(payments);
     }
