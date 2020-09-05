@@ -1,15 +1,12 @@
 package com.edu.mtdr.prpayment.controller;
 
-import com.edu.mtdr.prpayment.config.datasource.DbContextHolder;
-import com.edu.mtdr.prpayment.config.datasource.DbTypeEnum;
 import com.edu.mtdr.prpayment.model.BaseResponseMessage;
 import com.edu.mtdr.prpayment.model.FailureResponseMessage;
 import com.edu.mtdr.prpayment.model.RequestMessage;
 import com.edu.mtdr.prpayment.model.SuccessResponseMessage;
-import com.edu.mtdr.prpayment.repository.ParticipantRepository;
-import com.edu.mtdr.prpayment.repository.PaymentRepository;
 import com.edu.mtdr.prpayment.schema.ParticipantEntity;
 import com.edu.mtdr.prpayment.schema.PaymentEntity;
+import com.edu.mtdr.prpayment.service.IParticipantService;
 import com.edu.mtdr.prpayment.service.IPaymentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 
 /**
@@ -30,16 +25,11 @@ import java.util.stream.IntStream;
 @Api(tags = {"payments"}, value = "Payments controller")
 public class PaymentController {
     private final IPaymentService paymentService;
-    private final PaymentRepository paymentRepository;
-    private final ParticipantRepository participantRepository;
+    private final IParticipantService participantService;
 
-    @Autowired
-    public PaymentController(IPaymentService paymentService,
-                             PaymentRepository paymentRepository,
-                             ParticipantRepository participantRepository) {
+    public PaymentController(IPaymentService paymentService, IParticipantService participantService) {
         this.paymentService = paymentService;
-        this.paymentRepository = paymentRepository;
-        this.participantRepository = participantRepository;
+        this.participantService = participantService;
     }
 
     /**
@@ -48,12 +38,7 @@ public class PaymentController {
     @GetMapping("/list")
     @ApiOperation("List payments")
     public BaseResponseMessage<List<PaymentEntity>> listPayments() {
-        final List<PaymentEntity> payments = new ArrayList<>();
-        for (DbTypeEnum dbType : DbTypeEnum.values()) {
-            DbContextHolder.setCurrentDb(dbType);
-            payments.addAll(paymentRepository.findAll());
-        }
-        return new SuccessResponseMessage<>(payments);
+        return new SuccessResponseMessage<>(paymentService.findAll());
     }
 
     /**
@@ -63,7 +48,7 @@ public class PaymentController {
     @GetMapping("/get/{id}")
     @ApiOperation("Get payment by id")
     public BaseResponseMessage<PaymentEntity> getPayment(@PathVariable("id") Long id) {
-        final PaymentEntity dbPayment = paymentRepository.findById(id).orElse(null);
+        final PaymentEntity dbPayment = paymentService.findById(id).orElse(null);
         return new SuccessResponseMessage<>(dbPayment);
     }
 
@@ -84,7 +69,7 @@ public class PaymentController {
     @PostMapping("/delete")
     @ApiOperation("Delete payment")
     public BaseResponseMessage<?> deletePayment(@RequestBody RequestMessage<Long> message) {
-        paymentRepository.deleteById(message.getData());
+        paymentService.deleteById(message.getData());
         return new SuccessResponseMessage<>();
     }
 
@@ -95,7 +80,7 @@ public class PaymentController {
     @PostMapping("/sum")
     @ApiOperation("Get sum of payments, where specified participant name is sender")
     public BaseResponseMessage<?> sumPayments(@RequestBody RequestMessage<String> message) {
-        ParticipantEntity participant = participantRepository.findFirstByName(message.getData()).orElse(null);
+        ParticipantEntity participant = participantService.findFirstByName(message.getData()).orElse(null);
         if (participant != null) {
             BigDecimal sum = paymentService.sumAmountsBySender(participant.getId());
             return new SuccessResponseMessage<>(sum);
@@ -112,7 +97,7 @@ public class PaymentController {
     @PostMapping("/sum/shard")
     @ApiOperation("Get sum of payments, where specified participant name is sender")
     public BaseResponseMessage<?> sumPaymentsAtShard(@RequestBody RequestMessage<List<String>> message) {
-        ParticipantEntity participant = participantRepository.findFirstByName(message.getData().get(0)).orElse(null);
+        ParticipantEntity participant = participantService.findFirstByName(message.getData().get(0)).orElse(null);
         int shardNum = Integer.parseInt(message.getData().get(1));
         if (shardNum > 3 || shardNum < 1) {
             return new FailureResponseMessage<>("Shard num must be between 1 and 3");

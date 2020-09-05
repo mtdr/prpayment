@@ -7,6 +7,8 @@ import com.edu.mtdr.prpayment.schema.ParticipantEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -29,5 +31,28 @@ public class ParticipantService implements IParticipantService {
             participantRepository.save(participant);
         }
         return participant;
+    }
+
+    @Override
+    public List<ParticipantEntity> findAll() {
+        return participantRepository.findAll();
+    }
+
+    @Override
+    public Optional<ParticipantEntity> findById(Long id) {
+        return participantRepository.findById(id);
+    }
+
+    @Override
+    public Optional<ParticipantEntity> findFirstByName(String name) {
+        return participantRepository.findFirstByName(name);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        for (DbTypeEnum dbType : DbTypeEnum.values()) {
+            DbContextHolder.setCurrentDb(dbType);
+            participantRepository.deleteById(id);
+        }
     }
 }

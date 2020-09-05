@@ -26,12 +26,12 @@ public class ParticipantEntity extends BaseEntity {
     @ApiModelProperty(value = "Sent payments by this participant")
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sender", fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonIgnore
-    private Set<PaymentEntity> sentPayments = new HashSet<>();
+    private Set<PaymentEntity> sentPayments;
 
     @ApiModelProperty(value = "Received payments by this participant")
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "receiver", fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonIgnore
-    private Set<PaymentEntity> receivedPayments = new HashSet<>();
+    private Set<PaymentEntity> receivedPayments;
 
     public String getName() {
         return name;

@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -136,6 +133,34 @@ public class PaymentService implements IPaymentService {
             payments.add(payment);
         });
         return payments;
+    }
+
+    @Override
+    public List<PaymentEntity> findAll() {
+        final List<PaymentEntity> payments = new ArrayList<>();
+        for (DbTypeEnum dbType : DbTypeEnum.values()) {
+            DbContextHolder.setCurrentDb(dbType);
+            payments.addAll(paymentRepository.findAll());
+        }
+        return payments;
+    }
+
+    @Override
+    public Optional<PaymentEntity> findById(Long id) {
+        Optional<PaymentEntity> payment = Optional.empty();
+        for (DbTypeEnum dbType : DbTypeEnum.values()) {
+            DbContextHolder.setCurrentDb(dbType);
+            payment = paymentRepository.findById(id);
+        }
+        return payment;
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        for (DbTypeEnum dbType : DbTypeEnum.values()) {
+            DbContextHolder.setCurrentDb(dbType);
+            paymentRepository.deleteById(id);
+        }
     }
 
 }

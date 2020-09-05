@@ -3,7 +3,9 @@ package com.edu.mtdr.prpayment.service;
 import com.edu.mtdr.prpayment.schema.PaymentEntity;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Payment service
@@ -43,4 +45,22 @@ public interface IPaymentService {
      * @return list of generated but not persisted payments
      */
     List<PaymentEntity> generatePayments();
+
+    /**
+     * @return all payments from all shards
+     */
+    List<PaymentEntity> findAll();
+
+    /**
+     * @param id payment's id
+     * @return payment found last at all shards
+     */
+    Optional<PaymentEntity> findById(Long id);
+
+    /**
+     * Remove payment found on specified shard
+     *
+     * @param id payment id
+     */
+    void deleteById(Long id);
 }

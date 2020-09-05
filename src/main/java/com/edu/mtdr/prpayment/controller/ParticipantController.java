@@ -24,12 +24,9 @@ import java.util.List;
 @Api(tags = {"participants"}, value = "Participant controller")
 public class ParticipantController {
     private final IParticipantService participantService;
-    private final ParticipantRepository participantRepository;
 
-    @Autowired
     public ParticipantController(IParticipantService participantService, ParticipantRepository participantRepository) {
         this.participantService = participantService;
-        this.participantRepository = participantRepository;
     }
 
     /**
@@ -37,8 +34,8 @@ public class ParticipantController {
      */
     @GetMapping("/list")
     @ApiOperation("List participants")
-    public BaseResponseMessage<?> listParticipants() {
-        final List<ParticipantEntity> dbParticipants = new ArrayList<>(participantRepository.findAll());
+    public BaseResponseMessage<List<ParticipantEntity>> allParticipants() {
+        final List<ParticipantEntity> dbParticipants = new ArrayList<>(participantService.findAll());
         return new SuccessResponseMessage<>(dbParticipants);
     }
 
@@ -49,7 +46,7 @@ public class ParticipantController {
     @GetMapping("/get/{id}")
     @ApiOperation("Get participant by id")
     public BaseResponseMessage<ParticipantEntity> getParticipant(@PathVariable("id") Long id) {
-        final ParticipantEntity dbParticipant = participantRepository.findById(id).orElse(null);
+        final ParticipantEntity dbParticipant = participantService.findById(id).orElse(null);
         return new SuccessResponseMessage<>(dbParticipant);
     }
 
@@ -59,7 +56,7 @@ public class ParticipantController {
      */
     @PostMapping("/save")
     @ApiOperation("Create or update participant")
-    public BaseResponseMessage<?> saveParticipant(@RequestBody ParticipantEntity participant) {
+    public BaseResponseMessage<ParticipantEntity> saveParticipant(@RequestBody ParticipantEntity participant) {
         return new SuccessResponseMessage<>(participantService.save(participant));
     }
 
@@ -70,8 +67,8 @@ public class ParticipantController {
      */
     @PostMapping("/delete/id")
     @ApiOperation("Delete participant by id")
-    public BaseResponseMessage<?> deleteParticipantById(@RequestBody RequestMessage<Long> message) {
-        participantRepository.deleteById(message.getData());
+    public BaseResponseMessage<Void> deleteParticipantById(@RequestBody RequestMessage<Long> message) {
+        participantService.deleteById(message.getData());
         return new SuccessResponseMessage<>();
     }
 
@@ -82,10 +79,10 @@ public class ParticipantController {
      */
     @PostMapping("/delete/name")
     @ApiOperation("Delete participant by name")
-    public BaseResponseMessage<?> deleteParticipantByName(@RequestBody RequestMessage<String> message) {
-        ParticipantEntity participant = participantRepository.findFirstByName(message.getData()).orElse(null);
+    public BaseResponseMessage<Void> deleteParticipantByName(@RequestBody RequestMessage<String> message) {
+        ParticipantEntity participant = participantService.findFirstByName(message.getData()).orElse(null);
         if (participant != null) {
-            participantRepository.deleteById(participant.getId());
+            participantService.deleteById(participant.getId());
             return new SuccessResponseMessage<>();
         } else {
             return new FailureResponseMessage<>("Participant not found");
