@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -70,10 +71,10 @@ public class PaymentService implements IPaymentService {
                 payment.setId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
             }
             for (DbTypeEnum dbType : DbTypeEnum.values()) {
-                payments.parallelStream().filter(p -> p.getShardNum() == dbType.ordinal() + 1).forEach(p -> {
-                    DbContextHolder.setCurrentDb(dbType);
-                    paymentRepository.save(p);
-                });
+                DbContextHolder.setCurrentDb(dbType);
+                paymentRepository.saveAll(payments.parallelStream()
+                        .filter(p -> p.getShardNum() == dbType.ordinal() + 1)
+                        .collect(Collectors.toList()));
             }
             return true;
         } else {
