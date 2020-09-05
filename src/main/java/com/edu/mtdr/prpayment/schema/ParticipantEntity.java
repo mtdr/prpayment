@@ -6,8 +6,8 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @ApiModel(value = "Participant entity of payments")
@@ -52,6 +52,19 @@ public class ParticipantEntity extends BaseEntity {
 
     public void setReceivedPayments(Set<PaymentEntity> receivedPayments) {
         this.receivedPayments = receivedPayments;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ParticipantEntity that = (ParticipantEntity) o;
+        return name.equals(that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 
     @Override

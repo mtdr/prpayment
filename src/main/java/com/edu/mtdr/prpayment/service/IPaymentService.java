@@ -16,8 +16,8 @@ public interface IPaymentService {
     PaymentEntity save(PaymentEntity payment);
 
     /**
-     * @param sender
-     * @return
+     * @param senderId participant id
+     * @return sum of payments sent by participant
      */
-    BigDecimal sumAmountsBySender(ParticipantEntity sender);
+    BigDecimal sumAmountsBySender(Long senderId);
 }

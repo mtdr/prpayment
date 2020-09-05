@@ -13,8 +13,10 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -58,5 +60,12 @@ public class PaymentController {
     public BaseResponseMessage<?> deletePayment(@RequestBody PaymentEntity payment) {
         paymentRepository.deleteById(payment.getId());
         return new SuccessResponseMessage<>();
+    }
+
+    @PostMapping("/sum")
+    @ApiOperation("Get sum of payments, where specified participant id is sender")
+    public BaseResponseMessage<?> deletePayment(@RequestBody Long senderId) {
+        BigDecimal sum = Optional.ofNullable(paymentService.sumAmountsBySender(senderId)).orElse(BigDecimal.ZERO);
+        return new SuccessResponseMessage<>(sum);
     }
 }

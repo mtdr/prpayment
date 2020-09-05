@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * Payment service implementation
@@ -25,6 +26,8 @@ public class PaymentService implements IPaymentService {
     public PaymentEntity save(PaymentEntity payment) {
         if (payment != null) {
             int shardNum = payment.hashCode() % 3;
+            payment.setShardNum(shardNum);
+            payment.setDate(new Date());
             switch (shardNum) {
                 case 0:
                     return save1(payment);
@@ -41,8 +44,8 @@ public class PaymentService implements IPaymentService {
     }
 
     @Override
-    public BigDecimal sumAmountsBySender(ParticipantEntity sender) {
-        return paymentRepository.getSumBySender(sender);
+    public BigDecimal sumAmountsBySender(Long senderId) {
+        return paymentRepository.getSumBySenderId(senderId);
     }
 
 //    @Transactional(transactionManager = "tm1")

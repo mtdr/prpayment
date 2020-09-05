@@ -15,10 +15,16 @@ import java.math.BigDecimal;
 @Repository
 public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
     /**
-     * @param sender participant, who sent payment
+     * @param senderId id of participant, who sent payment
      * @return sum of payments by this participant
      */
-    @Query("SELECT SUM(p.amount) FROM PaymentEntity p WHERE p.sender = :sender")
-    BigDecimal getSumBySender(@Param("sender") ParticipantEntity sender);
+    @Query("SELECT SUM(p.amount) FROM PaymentEntity p WHERE p.sender.id = :id")
+    BigDecimal getSumBySenderId(@Param("id") Long senderId);
 
+
+    /**
+     * @param shardNum num of shard
+     * @return num of payments
+     */
+    Long countAllByShardNum(int shardNum);
 }

@@ -1,12 +1,15 @@
 package com.edu.mtdr.prpayment.schema;
 
-import javax.persistence.*;
-import java.math.BigDecimal;
-
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.annotations.Type;
+
+import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.Objects;
 
 
 @ApiModel(value = "Payment entity")
@@ -32,6 +35,13 @@ public class PaymentEntity extends BaseEntity {
     @ApiModelProperty(value = "Amount of payment")
     private BigDecimal amount;
 
+    @Type(type = "timestamp")
+    @ApiModelProperty(value = "Creation timestamp")
+    private Date date;
+
+    @Basic
+    private Integer shardNum;
+
     public ParticipantEntity getSender() {
         return sender;
     }
@@ -56,10 +66,44 @@ public class PaymentEntity extends BaseEntity {
         this.amount = amount;
     }
 
+    public Integer getShardNum() {
+        return shardNum;
+    }
+
+    public void setShardNum(Integer shardNum) {
+        this.shardNum = shardNum;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PaymentEntity that = (PaymentEntity) o;
+        return sender.equals(that.sender) &&
+                receiver.equals(that.receiver) &&
+                amount.equals(that.amount) &&
+                date.equals(that.date);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sender, receiver, amount, date);
+    }
+
     @Override
     public String toString() {
         return String.format(
                 "Payment [id=%d]",
                 getId());
     }
+
+
 }
