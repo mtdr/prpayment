@@ -13,7 +13,10 @@ import java.util.Objects;
 
 
 @ApiModel(value = "Payment entity")
-@Table(name = "payment")
+@Table(name = "payment", uniqueConstraints = {
+        @UniqueConstraint(name= "uc_paymententity_senderid_receiverid_amount_date",
+                columnNames = {"senderid", "receiverid", "amount", "date"})
+})
 @Entity
 @Access(AccessType.FIELD)
 public class PaymentEntity extends BaseEntity {

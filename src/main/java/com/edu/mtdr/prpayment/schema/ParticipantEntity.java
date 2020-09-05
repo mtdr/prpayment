@@ -11,12 +11,15 @@ import java.util.Objects;
 import java.util.Set;
 
 @ApiModel(value = "Participant entity of payments")
-@Table(name = "participant")
+@Table(name = "participant", uniqueConstraints = {
+        @UniqueConstraint(name= "uc_participantentity_name",
+                columnNames = "name")
+})
 @Entity
 @Access(AccessType.FIELD)
 public class ParticipantEntity extends BaseEntity {
     @NotBlank(message = "Name must be specified")
-    @ApiModelProperty(value = "name")
+    @ApiModelProperty(value = "Participant name")
     @Basic
     private String name;
 
