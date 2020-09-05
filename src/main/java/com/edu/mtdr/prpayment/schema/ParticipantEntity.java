@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,7 +15,7 @@ import java.util.Set;
 @Entity
 @Access(AccessType.FIELD)
 public class ParticipantEntity extends BaseEntity {
-    @NotNull
+    @NotBlank(message = "Name must be specified")
     @ApiModelProperty(value = "name")
     @Basic
     private String name;
