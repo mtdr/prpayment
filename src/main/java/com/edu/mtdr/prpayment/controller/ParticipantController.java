@@ -8,6 +8,7 @@ import com.edu.mtdr.prpayment.service.IParticipantService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -49,6 +50,12 @@ public class ParticipantController {
     public BaseResponseMessage<?> saveParticipant(@RequestBody ParticipantEntity participant) {
         final ParticipantEntity savedParticipant = participantRepository.save(participant);
         return new SuccessResponseMessage<>(savedParticipant);
+    }
+
+    @PostMapping("/save2")
+    @ApiOperation("Create or update participant")
+    public BaseResponseMessage<?> saveParticipant2(@RequestBody ParticipantEntity participant) {
+        return new SuccessResponseMessage<>(participantService.save2(participant));
     }
 
     @PostMapping("/delete")
