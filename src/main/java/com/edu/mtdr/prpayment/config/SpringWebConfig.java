@@ -1,4 +1,4 @@
-package com.edu.mtdr.prpayment.util;
+package com.edu.mtdr.prpayment.config;
 
 import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import org.springframework.context.annotation.Configuration;

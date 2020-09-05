@@ -1,4 +1,4 @@
-package com.edu.mtdr.prpayment.util;
+package com.edu.mtdr.prpayment.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
