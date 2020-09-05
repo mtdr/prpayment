@@ -17,7 +17,7 @@ public class PrPaymentExceptionHandler {
      */
     @ResponseBody
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public FailureResponseMessage<?> handleArgumentException(DataIntegrityViolationException e) {
+    public FailureResponseMessage<?> handleDataIntegrityExceptions(DataIntegrityViolationException e) {
         return new FailureResponseMessage<>(400, false, e.getMessage());
     }
 
@@ -30,7 +30,7 @@ public class PrPaymentExceptionHandler {
      */
     @ResponseBody
     @ExceptionHandler(Exception.class)
-    public FailureResponseMessage<?> handleArgumentException(Exception e) {
+    public FailureResponseMessage<?> handleCommonExceptions(Exception e) {
         return new FailureResponseMessage<>(400, false, e.getMessage());
     }
 }

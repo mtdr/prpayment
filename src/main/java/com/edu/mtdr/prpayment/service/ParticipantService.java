@@ -5,9 +5,9 @@ import com.edu.mtdr.prpayment.config.datasource.DbTypeEnum;
 import com.edu.mtdr.prpayment.repository.ParticipantRepository;
 import com.edu.mtdr.prpayment.schema.ParticipantEntity;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 /**
  * Participant service implementation
@@ -23,7 +23,11 @@ public class ParticipantService implements IParticipantService {
 
     @Override
     public ParticipantEntity save(ParticipantEntity participant) {
-        DbContextHolder.setCurrentDb(DbTypeEnum.SHARD1);
-        return participantRepository.save(participant);
+        participant.setId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
+        for (DbTypeEnum dbType : DbTypeEnum.values()) {
+            DbContextHolder.setCurrentDb(dbType);
+            participantRepository.save(participant);
+        }
+        return participant;
     }
 }

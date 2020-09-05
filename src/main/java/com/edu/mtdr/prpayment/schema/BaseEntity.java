@@ -1,10 +1,8 @@
 package com.edu.mtdr.prpayment.schema;
 
 import io.swagger.annotations.ApiModel;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.UUID;
 
 @ApiModel(value = "Base entity")
 @MappedSuperclass
@@ -12,13 +10,13 @@ import java.util.UUID;
 public abstract class BaseEntity {
     @Id
     @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+    private long id;
 
-    public UUID getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(long id) {
         this.id = id;
     }
 }

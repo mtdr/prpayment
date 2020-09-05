@@ -11,7 +11,7 @@ import java.util.UUID;
  * Participants repository
  */
 @Repository
-public interface ParticipantRepository extends JpaRepository<ParticipantEntity, UUID> {
+public interface ParticipantRepository extends JpaRepository<ParticipantEntity, Long> {
     /**
      * @param name participant name
      * @return firs found participant

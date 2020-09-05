@@ -42,7 +42,7 @@ public class ParticipantController {
 
     @GetMapping("/get/{id}")
     @ApiOperation("Get participant by id")
-    public BaseResponseMessage<ParticipantEntity> getParticipant(@PathVariable("id") UUID id) {
+    public BaseResponseMessage<ParticipantEntity> getParticipant(@PathVariable("id") Long id) {
         final ParticipantEntity dbParticipant = participantRepository.findById(id).orElse(null);
         return new SuccessResponseMessage<>(dbParticipant);
     }
@@ -50,14 +50,6 @@ public class ParticipantController {
     @PostMapping("/save")
     @ApiOperation("Create or update participant")
     public BaseResponseMessage<?> saveParticipant(@RequestBody ParticipantEntity participant) {
-        final ParticipantEntity savedParticipant = participantRepository.save(participant);
-        return new SuccessResponseMessage<>(savedParticipant);
-    }
-
-    @PostMapping("/save2")
-    @ApiOperation("Create or update participant")
-    public BaseResponseMessage<?> saveParticipant2(@RequestBody ParticipantEntity participant) {
-        DbContextHolder.setCurrentDb(DbTypeEnum.SHARD2);
         return new SuccessResponseMessage<>(participantService.save(participant));
     }
 

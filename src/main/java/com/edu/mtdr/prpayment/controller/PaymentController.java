@@ -45,7 +45,7 @@ public class PaymentController {
 
     @GetMapping("/get/{id}")
     @ApiOperation("Get payment by id")
-    public BaseResponseMessage<PaymentEntity> getPayment(@PathVariable("id") UUID id) {
+    public BaseResponseMessage<PaymentEntity> getPayment(@PathVariable("id") Long id) {
         final PaymentEntity dbPayment = paymentRepository.findById(id).orElse(null);
         return new SuccessResponseMessage<>(dbPayment);
     }
@@ -65,7 +65,7 @@ public class PaymentController {
 
     @PostMapping("/sum")
     @ApiOperation("Get sum of payments, where specified participant id is sender")
-    public BaseResponseMessage<?> deletePayment(@RequestBody UUID senderId) {
+    public BaseResponseMessage<?> deletePayment(@RequestBody Long senderId) {
         BigDecimal sum = Optional.ofNullable(paymentService.sumAmountsBySender(senderId)).orElse(BigDecimal.ZERO);
         return new SuccessResponseMessage<>(sum);
     }

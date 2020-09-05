@@ -1,10 +1,8 @@
 package com.edu.mtdr.prpayment.service;
 
-import com.edu.mtdr.prpayment.schema.ParticipantEntity;
 import com.edu.mtdr.prpayment.schema.PaymentEntity;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 /**
  * Payment service
@@ -20,5 +18,5 @@ public interface IPaymentService {
      * @param senderId participant id
      * @return sum of payments sent by participant
      */
-    BigDecimal sumAmountsBySender(UUID senderId);
+    BigDecimal sumAmountsBySender(Long senderId);
 }

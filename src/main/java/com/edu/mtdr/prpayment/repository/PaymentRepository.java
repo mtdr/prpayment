@@ -14,13 +14,13 @@ import java.util.UUID;
  * Payment repository
  */
 @Repository
-public interface PaymentRepository extends JpaRepository<PaymentEntity, UUID> {
+public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
     /**
      * @param senderId id of participant, who sent payment
      * @return sum of payments by this participant
      */
     @Query("SELECT SUM(p.amount) FROM PaymentEntity p WHERE p.sender.id = :id")
-    BigDecimal getSumBySenderId(@Param("id") UUID senderId);
+    BigDecimal getSumBySenderId(@Param("id") Long senderId);
 
 
     /**
