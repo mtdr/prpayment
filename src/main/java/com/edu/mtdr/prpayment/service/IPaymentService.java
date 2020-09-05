@@ -19,4 +19,11 @@ public interface IPaymentService {
      * @return sum of payments sent by participant
      */
     BigDecimal sumAmountsBySender(Long senderId);
+
+    /**
+     * @param senderId participant id
+     * @param shardNum num of shard (1 - 3)
+     * @return sum of payments sent by participant
+     */
+    BigDecimal sumAmountsBySenderAtOneShard(Long senderId, int shardNum);
 }

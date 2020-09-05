@@ -61,4 +61,11 @@ public class PaymentService implements IPaymentService {
         return res;
     }
 
+    @Override
+    public BigDecimal sumAmountsBySenderAtOneShard(Long senderId, int shardNum) {
+        DbTypeEnum dbType = DbTypeEnum.values()[shardNum - 1];
+        DbContextHolder.setCurrentDb(dbType);
+        return paymentRepository.getSumBySenderId(senderId);
+    }
+
 }

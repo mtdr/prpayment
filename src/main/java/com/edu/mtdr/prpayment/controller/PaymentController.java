@@ -90,7 +90,7 @@ public class PaymentController {
 
     /**
      * @param message {@link RequestMessage with participant name in {@link RequestMessage#getData()}}
-     * @return success with result or failure if unchecked message
+     * @return success with whole shards sum result or failure if unchecked message
      */
     @PostMapping("/sum")
     @ApiOperation("Get sum of payments, where specified participant name is sender")
@@ -103,6 +103,28 @@ public class PaymentController {
             return new FailureResponseMessage<>("Participant not found");
         }
     }
+
+
+    /**
+     * @param message {@link RequestMessage with participant name and shard number in {@link RequestMessage#getData()}}
+     * @return success with sum for one shard or failure if unchecked message
+     */
+    @PostMapping("/sum/shard")
+    @ApiOperation("Get sum of payments, where specified participant name is sender")
+    public BaseResponseMessage<?> sumPaymentsAtShard(@RequestBody RequestMessage<List<String>> message) {
+        ParticipantEntity participant = participantRepository.findFirstByName(message.getData().get(0)).orElse(null);
+        int shardNum = Integer.parseInt(message.getData().get(1));
+        if (shardNum > 3 || shardNum < 1) {
+            return new FailureResponseMessage<>("Shard num must be between 1 and 3");
+        }
+        if (participant != null) {
+            BigDecimal sum = paymentService.sumAmountsBySenderAtOneShard(participant.getId(), shardNum);
+            return new SuccessResponseMessage<>(sum);
+        } else {
+            return new FailureResponseMessage<>("Participant not found");
+        }
+    }
+
 
     /**
      * @return message with success, or fail if participants not found or some unchecked exception
