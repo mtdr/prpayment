@@ -5,7 +5,6 @@ import com.edu.mtdr.prpayment.config.datasource.DbTypeEnum;
 import com.edu.mtdr.prpayment.repository.PaymentRepository;
 import com.edu.mtdr.prpayment.schema.ParticipantEntity;
 import com.edu.mtdr.prpayment.schema.PaymentEntity;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -62,6 +61,11 @@ public class PaymentService implements IPaymentService {
     public Boolean saveAll(List<PaymentEntity> payments) {
         if (payments != null && payments.size() > 0) {
             for (PaymentEntity payment : payments) {
+                processParticipant(payment.getSender()).ifPresent(payment::setSender);
+                processParticipant(payment.getReceiver()).ifPresent(payment::setReceiver);
+                if (payment.getSender() == null || payment.getReceiver() == null) {
+                    continue;
+                }
                 int shardNum = getShardNum(payment);
                 if (payment.getDate() == null) {
                     payment.setDate(new Date());
@@ -78,6 +82,18 @@ public class PaymentService implements IPaymentService {
             return true;
         } else {
             return false;
+        }
+    }
+
+    private Optional<ParticipantEntity> processParticipant(ParticipantEntity sender) {
+        if (sender == null) {
+            return Optional.empty();
+        } else if (sender.getId() != 0) {
+            return participantService.findById(sender.getId());
+        } else if (sender.getName() != null) {
+            return participantService.findFirstByName(sender.getName());
+        } else {
+            return Optional.empty();
         }
     }
 

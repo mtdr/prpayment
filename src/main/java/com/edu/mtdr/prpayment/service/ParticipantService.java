@@ -4,18 +4,19 @@ import com.edu.mtdr.prpayment.config.datasource.DbContextHolder;
 import com.edu.mtdr.prpayment.config.datasource.DbTypeEnum;
 import com.edu.mtdr.prpayment.repository.ParticipantRepository;
 import com.edu.mtdr.prpayment.schema.ParticipantEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Participant service implementation
  */
 @Service
 public class ParticipantService implements IParticipantService {
+    private final Logger LOGGER = LoggerFactory.getLogger(ParticipantService.class);
     private final ParticipantRepository participantRepository;
 
     @Autowired
@@ -40,12 +41,30 @@ public class ParticipantService implements IParticipantService {
 
     @Override
     public Optional<ParticipantEntity> findById(Long id) {
-        return participantRepository.findById(id);
+        Set<ParticipantEntity> participantsAllShards = new HashSet<>();
+        for (DbTypeEnum dbType : DbTypeEnum.values()) {
+            DbContextHolder.setCurrentDb(dbType);
+            participantRepository.findById(id).ifPresent(participantsAllShards::add);
+        }
+        if (participantsAllShards.size() > 1) {
+            LOGGER.warn("Detected loss of synchronization in participants. By id = " + id + " found "
+                    + participantsAllShards.size() + " participants");
+        }
+        return Optional.ofNullable(participantsAllShards.iterator().next());
     }
 
     @Override
     public Optional<ParticipantEntity> findFirstByName(String name) {
-        return participantRepository.findFirstByName(name);
+        Set<ParticipantEntity> participantsAllShards = new HashSet<>();
+        for (DbTypeEnum dbType : DbTypeEnum.values()) {
+            DbContextHolder.setCurrentDb(dbType);
+            participantRepository.findFirstByName(name).ifPresent(participantsAllShards::add);
+        }
+        if (participantsAllShards.size() > 1) {
+            LOGGER.warn("Detected loss of synchronization in participants. By name = \"" + name + "\" found "
+                    + participantsAllShards.size() + " participants");
+        }
+        return Optional.ofNullable(participantsAllShards.iterator().next());
     }
 
     @Override
@@ -60,11 +79,11 @@ public class ParticipantService implements IParticipantService {
     public ParticipantEntity createWithName(String name) {
         ParticipantEntity participant = new ParticipantEntity();
         participant.setName(name);
-        return participantRepository.save(participant);
+        return save(participant);
     }
 
     @Override
     public ParticipantEntity getOrCreate(String name) {
-        return participantRepository.findFirstByName(name).orElseGet(() -> createWithName(name));
+        return findFirstByName(name).orElseGet(() -> createWithName(name));
     }
 }
