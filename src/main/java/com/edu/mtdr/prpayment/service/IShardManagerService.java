@@ -8,7 +8,7 @@ import com.edu.mtdr.prpayment.schema.PaymentEntity;
  */
 public interface IShardManagerService {
     /**
-     * @return number of shard (between 1 and 3
+     * @return number of shard (between 1 and 3)
      */
     int getShardNum(PaymentEntity payment);
 }
