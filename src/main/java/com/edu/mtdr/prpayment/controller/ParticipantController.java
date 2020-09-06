@@ -43,10 +43,21 @@ public class ParticipantController {
      * @param id {@link ParticipantEntity}'s id
      * @return {@link SuccessResponseMessage} with {@link ParticipantEntity}
      */
-    @GetMapping("/get/{id}")
+    @GetMapping("/get/id")
     @ApiOperation("Get participant by id")
-    public BaseResponseMessage<ParticipantEntity> getParticipant(@PathVariable("id") Long id) {
+    public BaseResponseMessage<ParticipantEntity> getParticipantById(@RequestParam Long id) {
         final ParticipantEntity dbParticipant = participantService.findById(id).orElse(null);
+        return new SuccessResponseMessage<>(dbParticipant);
+    }
+
+    /**
+     * @param name {@link ParticipantEntity}'s name
+     * @return {@link SuccessResponseMessage} with {@link ParticipantEntity}
+     */
+    @GetMapping("/get/name")
+    @ApiOperation("Get participant by name")
+    public BaseResponseMessage<ParticipantEntity> getParticipantByName(@RequestParam String name) {
+        final ParticipantEntity dbParticipant = participantService.findFirstByName(name).orElse(null);
         return new SuccessResponseMessage<>(dbParticipant);
     }
 

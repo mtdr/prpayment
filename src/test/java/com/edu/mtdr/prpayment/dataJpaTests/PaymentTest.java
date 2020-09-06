@@ -28,8 +28,8 @@ public class PaymentTest {
         ParticipantEntity bParticipant = new ParticipantEntity();
         bParticipant.setName("B");
 
-        this.entityManager.persist(aParticipant);
-        this.entityManager.persist(bParticipant);
+        aParticipant = this.entityManager.persistFlushFind(aParticipant);
+        bParticipant = this.entityManager.persistFlushFind(bParticipant);
 
         PaymentEntity payment = new PaymentEntity();
         payment.setSender(aParticipant);

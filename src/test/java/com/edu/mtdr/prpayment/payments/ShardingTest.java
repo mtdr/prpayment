@@ -1,26 +1,21 @@
 package com.edu.mtdr.prpayment.payments;
 
-import com.edu.mtdr.prpayment.repository.ParticipantRepository;
-import com.edu.mtdr.prpayment.repository.PaymentRepository;
 import com.edu.mtdr.prpayment.schema.ParticipantEntity;
-import com.edu.mtdr.prpayment.schema.PaymentEntity;
 import com.edu.mtdr.prpayment.service.IParticipantService;
 import com.edu.mtdr.prpayment.service.IPaymentService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.stream.IntStream;
-
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+/**
+ * Test based on using main database cluster
+ */
 @RunWith(SpringRunner.class)
 @ContextConfiguration(name = "test-db")
 @SpringBootTest
