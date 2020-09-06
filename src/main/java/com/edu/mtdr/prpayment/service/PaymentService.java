@@ -1,8 +1,6 @@
 package com.edu.mtdr.prpayment.service;
 
-import com.edu.mtdr.prpayment.config.datasource.DbContextHolder;
-import com.edu.mtdr.prpayment.config.datasource.DbTypeEnum;
-import com.edu.mtdr.prpayment.repository.PaymentRepository;
+import com.edu.mtdr.prpayment.dao.PaymentDao;
 import com.edu.mtdr.prpayment.schema.ParticipantEntity;
 import com.edu.mtdr.prpayment.schema.PaymentEntity;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,8 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 /**
@@ -19,7 +18,7 @@ import java.util.stream.IntStream;
  */
 @Service
 public class PaymentService implements IPaymentService {
-    private final PaymentRepository paymentRepository;
+    private final PaymentDao paymentDao;
     private final IParticipantService participantService;
     private final IGeneratorIdService generatorIdService;
     private final IShardManagerService shardManagerService;
@@ -28,11 +27,11 @@ public class PaymentService implements IPaymentService {
     private Integer countOfPayments;
 
 
-    public PaymentService(PaymentRepository paymentRepository,
+    public PaymentService(PaymentDao paymentDao,
                           IParticipantService participantService,
                           IGeneratorIdService generatorIdService,
                           IShardManagerService shardManagerService) {
-        this.paymentRepository = paymentRepository;
+        this.paymentDao = paymentDao;
         this.participantService = participantService;
         this.generatorIdService = generatorIdService;
         this.shardManagerService = shardManagerService;
@@ -40,25 +39,8 @@ public class PaymentService implements IPaymentService {
 
     @Override
     public PaymentEntity save(PaymentEntity payment) {
-        if (payment != null) {
-            processPayment(payment);
-            switch (payment.getShardNum()) {
-                case 1:
-                    DbContextHolder.setCurrentDb(DbTypeEnum.SHARD1);
-                    break;
-                case 2:
-                    DbContextHolder.setCurrentDb(DbTypeEnum.SHARD2);
-                    break;
-                case 3:
-                    DbContextHolder.setCurrentDb(DbTypeEnum.SHARD3);
-                    break;
-                default:
-                    break;
-            }
-            return paymentRepository.save(payment);
-        } else {
-            return null;
-        }
+        processPayment(payment);
+        return paymentDao.save(payment);
     }
 
     @Override
@@ -72,12 +54,7 @@ public class PaymentService implements IPaymentService {
                 }
                 processPayment(payment);
             }
-            for (DbTypeEnum dbType : DbTypeEnum.values()) {
-                DbContextHolder.setCurrentDb(dbType);
-                paymentRepository.saveAll(payments.parallelStream()
-                        .filter(p -> p.getShardNum() == dbType.ordinal() + 1)
-                        .collect(Collectors.toList()));
-            }
+            paymentDao.saveAll(payments);
             return true;
         } else {
             return false;
@@ -115,22 +92,12 @@ public class PaymentService implements IPaymentService {
 
     @Override
     public BigDecimal sumAmountsBySender(Long senderId) {
-        BigDecimal res = BigDecimal.ZERO;
-        for (DbTypeEnum dbType : DbTypeEnum.values()) {
-            DbContextHolder.setCurrentDb(dbType);
-            BigDecimal temp = paymentRepository.getSumBySenderId(senderId);
-            if (temp != null) {
-                res = res.add(temp);
-            }
-        }
-        return res;
+        return paymentDao.sumAmountsBySender(senderId);
     }
 
     @Override
     public BigDecimal sumAmountsBySenderAtOneShard(Long senderId, int shardNum) {
-        DbTypeEnum dbType = DbTypeEnum.values()[shardNum - 1];
-        DbContextHolder.setCurrentDb(dbType);
-        return paymentRepository.getSumBySenderId(senderId);
+        return paymentDao.sumAmountsBySenderAtOneShard(senderId, shardNum);
     }
 
     @Override
@@ -164,7 +131,7 @@ public class PaymentService implements IPaymentService {
     }
 
     /**
-     * @param sender sender participant
+     * @param sender   sender participant
      * @param receiver receiver participant
      * @return list of N created random amounted payments, N = {@link PaymentService#countOfPayments}
      */
@@ -182,37 +149,22 @@ public class PaymentService implements IPaymentService {
 
     @Override
     public List<PaymentEntity> findAll() {
-        final List<PaymentEntity> payments = new ArrayList<>();
-        for (DbTypeEnum dbType : DbTypeEnum.values()) {
-            DbContextHolder.setCurrentDb(dbType);
-            payments.addAll(paymentRepository.findAll());
-        }
-        return payments;
+        return paymentDao.findAll();
     }
 
     @Override
     public Optional<PaymentEntity> findById(Long id) {
-        Optional<PaymentEntity> payment = Optional.empty();
-        for (DbTypeEnum dbType : DbTypeEnum.values()) {
-            DbContextHolder.setCurrentDb(dbType);
-            payment = paymentRepository.findById(id);
-        }
-        return payment;
+        return paymentDao.findById(id);
     }
 
     @Override
     public void deleteById(Long id) {
-        for (DbTypeEnum dbType : DbTypeEnum.values()) {
-            DbContextHolder.setCurrentDb(dbType);
-            paymentRepository.deleteById(id);
-        }
+        paymentDao.deleteById(id);
     }
 
     @Override
     public Long countAllByShardNum(int shardNum) {
-        DbTypeEnum dbType = DbTypeEnum.values()[shardNum - 1];
-        DbContextHolder.setCurrentDb(dbType);
-        return paymentRepository.count();
+        return paymentDao.countAllByShardNum(shardNum);
     }
 
 }
