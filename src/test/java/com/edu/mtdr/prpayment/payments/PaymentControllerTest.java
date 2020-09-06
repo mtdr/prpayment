@@ -27,8 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(PaymentController.class)
-public class ShardingControllerTest {
+@WebMvcTest(com.edu.mtdr.prpayment.controller.PaymentController.class)
+public class PaymentControllerTest {
     @Autowired
     private MockMvc mvc;
 
