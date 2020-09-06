@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -92,7 +93,7 @@ public class PaymentService implements IPaymentService {
         payment.setId(generatorIdService.generateId());
         payment.setShardNum(shardManagerService.getShardNum(payment));
         if (payment.getDate() == null) {
-            payment.setDate(new Date());
+            payment.setDate(LocalDateTime.now());
         }
     }
 

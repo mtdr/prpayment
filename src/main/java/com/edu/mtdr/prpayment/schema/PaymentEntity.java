@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
 
@@ -38,9 +39,10 @@ public class PaymentEntity extends BaseEntity {
     @ApiModelProperty(value = "Amount of payment")
     private BigDecimal amount;
 
-    @Type(type = "timestamp")
+    @Basic
+    @Column(columnDefinition = "TIMESTAMP")
     @ApiModelProperty(value = "Creation timestamp")
-    private Date date;
+    private LocalDateTime date;
 
     @Basic
     private Integer shardNum;
@@ -77,11 +79,11 @@ public class PaymentEntity extends BaseEntity {
         this.shardNum = shardNum;
     }
 
-    public Date getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 

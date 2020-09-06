@@ -66,7 +66,9 @@ public class ParticipantService implements IParticipantService {
             LOGGER.warn("Detected loss of synchronization in participants. By name = \"" + name + "\" found "
                     + participantsAllShards.size() + " participants");
         }
-        return Optional.ofNullable(participantsAllShards.iterator().next());
+        return Optional.ofNullable(participantsAllShards.iterator().hasNext()
+                ? participantsAllShards.iterator().next()
+                : null);
     }
 
     @Override
