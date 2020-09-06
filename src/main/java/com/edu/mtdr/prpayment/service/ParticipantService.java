@@ -55,4 +55,16 @@ public class ParticipantService implements IParticipantService {
             participantRepository.deleteById(id);
         }
     }
+
+    @Override
+    public ParticipantEntity createWithName(String name) {
+        ParticipantEntity participant = new ParticipantEntity();
+        participant.setName(name);
+        return participantRepository.save(participant);
+    }
+
+    @Override
+    public ParticipantEntity getOrCreate(String name) {
+        return participantRepository.findFirstByName(name).orElseGet(() -> createWithName(name));
+    }
 }

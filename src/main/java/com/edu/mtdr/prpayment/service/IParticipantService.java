@@ -41,4 +41,16 @@ public interface IParticipantService {
      * @param id id of participant to delete
      */
     void deleteById(Long id);
+
+    /**
+     * @param name name of participant to create
+     * @return saved participant
+     */
+    ParticipantEntity createWithName(String name);
+
+    /**
+     * @param name name of participant
+     * @return stored in db or saved in moment participant
+     */
+    ParticipantEntity getOrCreate(String name);
 }

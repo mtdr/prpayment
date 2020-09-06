@@ -44,7 +44,7 @@ public interface IPaymentService {
     /**
      * @return list of generated but not persisted payments
      */
-    List<PaymentEntity> generatePayments();
+    List<PaymentEntity> generatePaymentsForFixedParticipants();
 
     /**
      * @return all payments from all shards

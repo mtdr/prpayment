@@ -10,7 +10,6 @@ import com.edu.mtdr.prpayment.service.IParticipantService;
 import com.edu.mtdr.prpayment.service.IPaymentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -126,9 +125,9 @@ public class PaymentController {
     /**
      * @return message with success, or fail if participants not found or some unchecked exception
      */
-    @PostMapping("/generate/save")
+    @PostMapping("/generate/list/save")
     @ApiOperation("Generate payments for a and b participants and save")
-    public BaseResponseMessage<?> generateAndSavePayments() {
+    public BaseResponseMessage<Void> generateAndSavePayments() {
         if (paymentService.generateAndSavePayments()) {
             return new SuccessResponseMessage<>();
         } else {
@@ -139,9 +138,9 @@ public class PaymentController {
     /**
      * @return message with list of generated payments
      */
-    @PostMapping("/generate")
+    @PostMapping("/generate/list")
     @ApiOperation("Generate payments for a and b participants")
-    public BaseResponseMessage<?> generatePayments() {
-        return new SuccessResponseMessage<>(paymentService.generatePayments());
+    public BaseResponseMessage<List<PaymentEntity>> generatePayments() {
+        return new SuccessResponseMessage<>(paymentService.generatePaymentsForFixedParticipants());
     }
 }

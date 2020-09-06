@@ -2,11 +2,11 @@ package com.edu.mtdr.prpayment.service;
 
 import com.edu.mtdr.prpayment.config.datasource.DbContextHolder;
 import com.edu.mtdr.prpayment.config.datasource.DbTypeEnum;
-import com.edu.mtdr.prpayment.repository.ParticipantRepository;
 import com.edu.mtdr.prpayment.repository.PaymentRepository;
 import com.edu.mtdr.prpayment.schema.ParticipantEntity;
 import com.edu.mtdr.prpayment.schema.PaymentEntity;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,13 +20,15 @@ import java.util.stream.IntStream;
 @Service
 public class PaymentService implements IPaymentService {
     private final PaymentRepository paymentRepository;
-    private final ParticipantRepository participantRepository;
+    private final IParticipantService participantService;
 
-    @Autowired
-    public PaymentService(PaymentRepository paymentRepository,
-                          ParticipantRepository participantRepository) {
+    @Value("${generate.payments.count}")
+    private Integer countOfPayments;
+
+
+    public PaymentService(PaymentRepository paymentRepository, IParticipantService participantService) {
         this.paymentRepository = paymentRepository;
-        this.participantRepository = participantRepository;
+        this.participantService = participantService;
     }
 
     @Override
@@ -105,30 +107,45 @@ public class PaymentService implements IPaymentService {
 
     @Override
     public Boolean generateAndSavePayments() {
-        List<PaymentEntity> payments = generatePayments();
+        List<PaymentEntity> payments = generatePaymentsForFixedParticipants();
         return saveAll(payments);
     }
 
     @Override
-    public List<PaymentEntity> generatePayments() {
+    public List<PaymentEntity> generatePaymentsForFixedParticipants() {
+        ParticipantEntity aParticipant = participantService.getOrCreate("a");
+        ParticipantEntity bParticipant = participantService.getOrCreate("b");
+        return generatePayments(aParticipant, bParticipant);
+    }
+
+    /**
+     * @param aParticipant first participant
+     * @param bParticipant second participant
+     * @return generated list of N random amounted payments, N = {@link PaymentService#countOfPayments}
+     */
+    public List<PaymentEntity> generatePayments(ParticipantEntity aParticipant, ParticipantEntity bParticipant) {
         List<PaymentEntity> payments = new ArrayList<>();
-        ParticipantEntity aParticipant = participantRepository.findFirstByName("a").orElse(null);
-        ParticipantEntity bParticipant = participantRepository.findFirstByName("b").orElse(null);
         if (aParticipant == null || bParticipant == null) {
             return payments;
         }
-        IntStream.rangeClosed(0, (int) Math.pow(10, 4)).forEach(i -> {
-            PaymentEntity payment = new PaymentEntity();
-            payment.setSender(aParticipant);
-            payment.setReceiver(bParticipant);
-            payment.setAmount(BigDecimal.valueOf(Math.random()).multiply(BigDecimal.valueOf(1000)));
-            payments.add(payment);
-        });
+        if (countOfPayments != 0) {
+            payments.addAll(createPayments(aParticipant, bParticipant));
+            payments.addAll(createPayments(bParticipant, aParticipant));
+        }
+        return payments;
+    }
 
-        IntStream.rangeClosed(0, (int) Math.pow(10, 4)).forEach(i -> {
+    /**
+     * @param sender sender participant
+     * @param receiver receiver participant
+     * @return list of N created random amounted payments, N = {@link PaymentService#countOfPayments}
+     */
+    private List<PaymentEntity> createPayments(ParticipantEntity sender, ParticipantEntity receiver) {
+        List<PaymentEntity> payments = new ArrayList<>();
+        IntStream.rangeClosed(0, countOfPayments / 2).forEach(i -> {
             PaymentEntity payment = new PaymentEntity();
-            payment.setSender(bParticipant);
-            payment.setReceiver(aParticipant);
+            payment.setSender(sender);
+            payment.setReceiver(receiver);
             payment.setAmount(BigDecimal.valueOf(Math.random()).multiply(BigDecimal.valueOf(1000)));
             payments.add(payment);
         });
