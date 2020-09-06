@@ -124,20 +124,16 @@ public class PaymentService implements IPaymentService {
             return payments;
         }
         if (countOfPayments != 0) {
-            payments.addAll(createPayments(aParticipant, bParticipant));
-            payments.addAll(createPayments(bParticipant, aParticipant));
+            payments.addAll(createBatchOfRandomPayments(aParticipant, bParticipant, countOfPayments / 2));
+            payments.addAll(createBatchOfRandomPayments(bParticipant, aParticipant, countOfPayments / 2));
         }
         return payments;
     }
 
-    /**
-     * @param sender   sender participant
-     * @param receiver receiver participant
-     * @return list of N created random amounted payments, N = {@link PaymentService#countOfPayments}
-     */
-    private List<PaymentEntity> createPayments(ParticipantEntity sender, ParticipantEntity receiver) {
+    @Override
+    public List<PaymentEntity> createBatchOfRandomPayments(ParticipantEntity sender, ParticipantEntity receiver, int count) {
         List<PaymentEntity> payments = new ArrayList<>();
-        IntStream.rangeClosed(0, countOfPayments / 2).forEach(i -> {
+        IntStream.rangeClosed(0, count).forEach(i -> {
             PaymentEntity payment = new PaymentEntity();
             payment.setSender(sender);
             payment.setReceiver(receiver);

@@ -1,9 +1,9 @@
 package com.edu.mtdr.prpayment.service;
 
+import com.edu.mtdr.prpayment.schema.ParticipantEntity;
 import com.edu.mtdr.prpayment.schema.PaymentEntity;
 
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,4 +69,12 @@ public interface IPaymentService {
      * @return count of payments at specified shard
      */
     Long countAllByShardNum(int shardNum);
+
+    /**
+     * @param sender   sender participant
+     * @param receiver receiver participant
+     * @param count    N - num of payments
+     * @return list of N created random amounted payments
+     */
+    List<PaymentEntity> createBatchOfRandomPayments(ParticipantEntity sender, ParticipantEntity receiver, int count);
 }
