@@ -1,35 +1,33 @@
 package com.edu.mtdr.prpayment.dataJpaTests;
 
-import com.edu.mtdr.prpayment.repository.ParticipantRepository;
 import com.edu.mtdr.prpayment.schema.ParticipantEntity;
 import com.edu.mtdr.prpayment.service.IParticipantService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-@DataJpaTest
+@SpringBootTest
+@ActiveProfiles("test")
 public class ParticipantTest {
-    @Autowired
-    private TestEntityManager entityManager;
-
     @Autowired
     private IParticipantService participantService;
 
     @Test
-    public void testCreateParticipant() {
-        String name = "A";
+    public void shouldCreateParticipantAndCheck() {
+        String name = "test2";
         ParticipantEntity participantEntity = new ParticipantEntity();
         participantEntity.setName(name);
-        this.entityManager.persist(participantEntity);
+        participantService.save(participantEntity);
 
         participantEntity = participantService.findFirstByName(name).orElseThrow();
         assertThat(participantEntity.getName()).isEqualTo(name);
+        participantService.deleteById(participantEntity.getId());
     }
 
 
