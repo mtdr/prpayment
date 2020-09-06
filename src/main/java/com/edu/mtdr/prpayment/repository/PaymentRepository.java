@@ -21,11 +21,4 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
      */
     @Query("SELECT SUM(p.amount) FROM PaymentEntity p WHERE p.sender.id = :id")
     BigDecimal getSumBySenderId(@Param("id") Long senderId);
-
-
-    /**
-     * @param shardNum num of shard
-     * @return num of payments
-     */
-    Long countAllByShardNum(int shardNum);
 }

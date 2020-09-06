@@ -26,12 +26,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ActiveProfiles("test")
 public class DistributionTest {
     @Autowired
-    private ParticipantRepository participantRepository;
-    @Autowired
-    private PaymentRepository paymentRepository;
-
-    @Autowired
     private IPaymentService paymentService;
+    @Autowired
+    private IParticipantService participantService;
+
+
 
     @Test
     public void simpleTest() {
@@ -40,9 +39,10 @@ public class DistributionTest {
         ParticipantEntity bParticipant = new ParticipantEntity();
         bParticipant.setName("B");
 
-        participantRepository.saveAll(Arrays.asList(aParticipant, bParticipant));
-        ParticipantEntity savedAParticipant = participantRepository.findFirstByName(aParticipant.getName()).orElse(null);
-        ParticipantEntity savedBParticipant = participantRepository.findFirstByName(bParticipant.getName()).orElse(null);
+        participantService.save(aParticipant);
+        participantService.save(bParticipant);
+        ParticipantEntity savedAParticipant = participantService.findFirstByName(aParticipant.getName()).orElse(null);
+        ParticipantEntity savedBParticipant = participantService.findFirstByName(bParticipant.getName()).orElse(null);
 
         assertNotNull(savedAParticipant);
         assertNotNull(savedBParticipant);
@@ -63,12 +63,12 @@ public class DistributionTest {
             paymentService.save(payment);
         });
 
-        System.out.println(paymentRepository.countAllByShardNum(0));
-        System.out.println(paymentRepository.countAllByShardNum(1));
-        System.out.println(paymentRepository.countAllByShardNum(2));
+        System.out.println(paymentService.countAllByShardNum(1));
+        System.out.println(paymentService.countAllByShardNum(2));
+        System.out.println(paymentService.countAllByShardNum(3));
 
-        System.out.println(paymentRepository.getSumBySenderId(savedAParticipant.getId()));
-        System.out.println(paymentRepository.getSumBySenderId(savedBParticipant.getId()));
+        System.out.println(paymentService.sumAmountsBySender(savedAParticipant.getId()));
+        System.out.println(paymentService.sumAmountsBySender(savedBParticipant.getId()));
     }
 
 }

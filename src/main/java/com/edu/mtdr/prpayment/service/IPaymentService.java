@@ -63,4 +63,10 @@ public interface IPaymentService {
      * @param id payment id
      */
     void deleteById(Long id);
+
+    /**
+     * @param shardNum number of shard
+     * @return count of payments at specified shard
+     */
+    Long countAllByShardNum(int shardNum);
 }

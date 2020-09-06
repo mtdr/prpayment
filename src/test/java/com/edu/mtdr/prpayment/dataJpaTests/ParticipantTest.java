@@ -2,6 +2,7 @@ package com.edu.mtdr.prpayment.dataJpaTests;
 
 import com.edu.mtdr.prpayment.repository.ParticipantRepository;
 import com.edu.mtdr.prpayment.schema.ParticipantEntity;
+import com.edu.mtdr.prpayment.service.IParticipantService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ public class ParticipantTest {
     private TestEntityManager entityManager;
 
     @Autowired
-    private ParticipantRepository participantRepository;
+    private IParticipantService participantService;
 
     @Test
     public void testCreateParticipant() {
@@ -27,7 +28,7 @@ public class ParticipantTest {
         participantEntity.setName(name);
         this.entityManager.persist(participantEntity);
 
-        participantEntity = participantRepository.findFirstByName(name).orElseThrow();
+        participantEntity = participantService.findFirstByName(name).orElseThrow();
         assertThat(participantEntity.getName()).isEqualTo(name);
     }
 

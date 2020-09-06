@@ -207,4 +207,11 @@ public class PaymentService implements IPaymentService {
         }
     }
 
+    @Override
+    public Long countAllByShardNum(int shardNum) {
+        DbTypeEnum dbType = DbTypeEnum.values()[shardNum - 1];
+        DbContextHolder.setCurrentDb(dbType);
+        return paymentRepository.count();
+    }
+
 }
