@@ -6,13 +6,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
@@ -41,7 +39,7 @@ public class H2TestProfileJPAConfig {
     @Bean(name = "testTransactionManager")
     @Profile("test")
     public JpaTransactionManager jpaTransactionManager(@Qualifier("testDataSource")
-                                                                   DataSource testDataSource) {
+                                                               DataSource testDataSource) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactoryBean(testDataSource).getObject());
         return transactionManager;
@@ -56,7 +54,7 @@ public class H2TestProfileJPAConfig {
     @Bean(name = "testEntityManager")
     @Profile("test")
     public LocalContainerEntityManagerFactoryBean entityManagerFactoryBean(@Qualifier("testDataSource")
-                                                                                       DataSource testDataSource) {
+                                                                                   DataSource testDataSource) {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactoryBean.setJpaVendorAdapter(vendorAdaptor());
         entityManagerFactoryBean.setJpaProperties(hibernateProperties());
