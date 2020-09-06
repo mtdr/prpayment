@@ -20,26 +20,28 @@ import java.util.stream.IntStream;
 public class PaymentService implements IPaymentService {
     private final PaymentRepository paymentRepository;
     private final IParticipantService participantService;
+    private final IGeneratorIdService generatorIdService;
+    private final IShardManagerService shardManagerService;
 
     @Value("${generate.payments.count}")
     private Integer countOfPayments;
 
 
-    public PaymentService(PaymentRepository paymentRepository, IParticipantService participantService) {
+    public PaymentService(PaymentRepository paymentRepository,
+                          IParticipantService participantService,
+                          IGeneratorIdService generatorIdService,
+                          IShardManagerService shardManagerService) {
         this.paymentRepository = paymentRepository;
         this.participantService = participantService;
+        this.generatorIdService = generatorIdService;
+        this.shardManagerService = shardManagerService;
     }
 
     @Override
     public PaymentEntity save(PaymentEntity payment) {
         if (payment != null) {
-            int shardNum = getShardNum(payment);
-            payment.setShardNum(shardNum);
-            if (payment.getDate() == null) {
-                payment.setDate(new Date());
-            }
-            payment.setId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
-            switch (shardNum) {
+            processPayment(payment);
+            switch (payment.getShardNum()) {
                 case 1:
                     DbContextHolder.setCurrentDb(DbTypeEnum.SHARD1);
                     break;
@@ -67,12 +69,7 @@ public class PaymentService implements IPaymentService {
                 if (payment.getSender() == null || payment.getReceiver() == null) {
                     continue;
                 }
-                int shardNum = getShardNum(payment);
-                if (payment.getDate() == null) {
-                    payment.setDate(new Date());
-                }
-                payment.setShardNum(shardNum);
-                payment.setId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
+                processPayment(payment);
             }
             for (DbTypeEnum dbType : DbTypeEnum.values()) {
                 DbContextHolder.setCurrentDb(dbType);
@@ -86,24 +83,33 @@ public class PaymentService implements IPaymentService {
         }
     }
 
-    private Optional<ParticipantEntity> processParticipant(ParticipantEntity sender) {
-        if (sender == null) {
-            return Optional.empty();
-        } else if (sender.getId() != 0) {
-            return participantService.findById(sender.getId());
-        } else if (sender.getName() != null) {
-            return participantService.findFirstByName(sender.getName());
-        } else {
-            return Optional.empty();
+    /**
+     * Set id, shard number and date if necessary
+     *
+     * @param payment payment to process
+     */
+    private void processPayment(PaymentEntity payment) {
+        payment.setId(generatorIdService.generateId());
+        payment.setShardNum(shardManagerService.getShardNum(payment));
+        if (payment.getDate() == null) {
+            payment.setDate(new Date());
         }
     }
 
     /**
-     * @param payment payment to process
-     * @return number of shard
+     * @param participant participant to process
+     * @return optional with found in db participant
      */
-    private int getShardNum(PaymentEntity payment) {
-        return Math.abs(payment.hashCode()) % 3 + 1;
+    private Optional<ParticipantEntity> processParticipant(ParticipantEntity participant) {
+        if (participant == null) {
+            return Optional.empty();
+        } else if (participant.getId() != 0) {
+            return participantService.findById(participant.getId());
+        } else if (participant.getName() != null) {
+            return participantService.findFirstByName(participant.getName());
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override

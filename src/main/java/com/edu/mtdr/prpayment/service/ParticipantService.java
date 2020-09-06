@@ -18,15 +18,17 @@ import java.util.*;
 public class ParticipantService implements IParticipantService {
     private final Logger LOGGER = LoggerFactory.getLogger(ParticipantService.class);
     private final ParticipantRepository participantRepository;
+    private final IGeneratorIdService generatorIdService;
 
-    @Autowired
-    public ParticipantService(ParticipantRepository participantRepository) {
+    public ParticipantService(ParticipantRepository participantRepository,
+                              IGeneratorIdService generatorIdService) {
         this.participantRepository = participantRepository;
+        this.generatorIdService = generatorIdService;
     }
 
     @Override
     public ParticipantEntity save(ParticipantEntity participant) {
-        participant.setId(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE);
+        participant.setId(generatorIdService.generateId());
         for (DbTypeEnum dbType : DbTypeEnum.values()) {
             DbContextHolder.setCurrentDb(dbType);
             participantRepository.save(participant);
