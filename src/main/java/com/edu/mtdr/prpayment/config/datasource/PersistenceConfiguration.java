@@ -3,6 +3,7 @@ package com.edu.mtdr.prpayment.config.datasource;
 import com.zaxxer.hikari.HikariDataSource;
 import org.hibernate.cfg.AvailableSettings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -58,11 +59,13 @@ public class PersistenceConfiguration {
     }
 
     @Bean(name = "multiRoutingDataSource")
-    public DataSource multiRoutingDataSource() {
+    public DataSource multiRoutingDataSource(@Qualifier("shard1DS") DataSource shard1DS,
+                                             @Qualifier("shard2DS") DataSource shard2DS,
+                                             @Qualifier("shard3DS") DataSource shard3DS) {
         Map<Object, Object> targetDataSources = new HashMap<>();
-        targetDataSources.put(DbTypeEnum.SHARD1, shard1DS());
-        targetDataSources.put(DbTypeEnum.SHARD2, shard2DS());
-        targetDataSources.put(DbTypeEnum.SHARD3, shard3DS());
+        targetDataSources.put(DbTypeEnum.SHARD1, shard1DS);
+        targetDataSources.put(DbTypeEnum.SHARD2, shard2DS);
+        targetDataSources.put(DbTypeEnum.SHARD3, shard3DS);
         MultiRoutingDataSource multiRoutingDataSource = new MultiRoutingDataSource();
         multiRoutingDataSource.setDefaultTargetDataSource(shard1DS());
         multiRoutingDataSource.setTargetDataSources(targetDataSources);
@@ -70,9 +73,11 @@ public class PersistenceConfiguration {
     }
 
     @Bean(name = "multiEntityManager")
-    public LocalContainerEntityManagerFactoryBean multiEntityManager() {
+    public LocalContainerEntityManagerFactoryBean multiEntityManager(@Qualifier("shard1DS") DataSource shard1DS,
+                                                                     @Qualifier("shard2DS") DataSource shard2DS,
+                                                                     @Qualifier("shard3DS") DataSource shard3DS) {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(multiRoutingDataSource());
+        em.setDataSource(multiRoutingDataSource(shard1DS, shard2DS, shard3DS));
         em.setPackagesToScan(PACKAGE_SCAN);
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
@@ -81,19 +86,23 @@ public class PersistenceConfiguration {
     }
 
     @Bean(name = "multiTransactionManager")
-    public PlatformTransactionManager multiTransactionManager() {
+    public PlatformTransactionManager multiTransactionManager(@Qualifier("shard1DS") DataSource shard1DS,
+                                                              @Qualifier("shard2DS") DataSource shard2DS,
+                                                              @Qualifier("shard3DS") DataSource shard3DS) {
         JpaTransactionManager transactionManager
                 = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(
-                multiEntityManager().getObject());
+                multiEntityManager(shard1DS, shard2DS, shard3DS).getObject());
         return transactionManager;
     }
 
     @Primary
     @Bean(name = "dbSessionFactory")
-    public LocalSessionFactoryBean dbSessionFactory() {
+    public LocalSessionFactoryBean dbSessionFactory(@Qualifier("shard1DS") DataSource shard1DS,
+                                                    @Qualifier("shard2DS") DataSource shard2DS,
+                                                    @Qualifier("shard3DS") DataSource shard3DS) {
         LocalSessionFactoryBean sessionFactoryBean = new LocalSessionFactoryBean();
-        sessionFactoryBean.setDataSource(multiRoutingDataSource());
+        sessionFactoryBean.setDataSource(multiRoutingDataSource(shard1DS, shard2DS, shard3DS));
         sessionFactoryBean.setPackagesToScan(PACKAGE_SCAN);
         sessionFactoryBean.setHibernateProperties(hibernateProperties());
         return sessionFactoryBean;
