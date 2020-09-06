@@ -10,6 +10,7 @@ import com.edu.mtdr.prpayment.service.IParticipantService;
 import com.edu.mtdr.prpayment.service.IPaymentService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -46,7 +47,9 @@ public class PaymentController {
      */
     @GetMapping("/get/{id}")
     @ApiOperation("Get payment by id")
-    public BaseResponseMessage<PaymentEntity> getPayment(@PathVariable("id") Long id) {
+    public BaseResponseMessage<PaymentEntity> getPayment(@ApiParam(value = "The payment id", required = true, type = "java.lang.Long")
+                                                         @PathVariable("id")
+                                                                 Long id) {
         final PaymentEntity dbPayment = paymentService.findById(id).orElse(null);
         return new SuccessResponseMessage<>(dbPayment);
     }
@@ -94,7 +97,7 @@ public class PaymentController {
      * @return success with sum for one shard or failure if unchecked message
      */
     @PostMapping("/sum/shard")
-    @ApiOperation("Get sum of payments, where specified participant name is sender")
+    @ApiOperation("Get sum of payments on specified shard, where specified participant name is sender")
     public BaseResponseMessage<?> sumPaymentsAtShard(@RequestBody RequestMessage<List<String>> message) {
         ParticipantEntity participant = participantService.findFirstByName(message.getData().get(0)).orElse(null);
         int shardNum = Integer.parseInt(message.getData().get(1));
