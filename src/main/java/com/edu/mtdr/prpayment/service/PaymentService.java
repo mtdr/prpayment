@@ -42,16 +42,17 @@ public class PaymentService implements IPaymentService {
             switch (shardNum) {
                 case 1:
                     DbContextHolder.setCurrentDb(DbTypeEnum.SHARD1);
-                    return paymentRepository.save(payment);
+                    break;
                 case 2:
                     DbContextHolder.setCurrentDb(DbTypeEnum.SHARD2);
-                    return paymentRepository.save(payment);
+                    break;
                 case 3:
                     DbContextHolder.setCurrentDb(DbTypeEnum.SHARD3);
-                    return paymentRepository.save(payment);
+                    break;
                 default:
-                    return paymentRepository.save(payment);
+                    break;
             }
+            return paymentRepository.save(payment);
         } else {
             return null;
         }
@@ -97,6 +98,10 @@ public class PaymentService implements IPaymentService {
         }
     }
 
+    /**
+     * @param payment payment to process
+     * @return number of shard
+     */
     private int getShardNum(PaymentEntity payment) {
         return Math.abs(payment.hashCode()) % 3 + 1;
     }
